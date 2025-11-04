@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Control Room DSR{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center min-vh-100 align-items-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="login-card">
+                <div class="text-center mb-4">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <h3>Login to System</h3>
+                    <p class="text-muted">Enter your credentials to continue</p>
+                </div>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="user_type" class="form-label">Login Type</label>
+                        <select class="form-select" id="user_type" name="user_type" required>
+                            <option value="">Select Login Type</option>
+                            <option value="admin" {% if request.args.get('type') == 'admin' %}selected{% endif %}>Administrator</option>
+                            <option value="district" {% if request.args.get('type') == 'district' %}selected{% endif %}>District User</option>
+                            <option value="controlroom" {% if request.args.get('type') == 'controlroom' %}selected{% endif %}>Control Room</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="district_select" style="display: none;">
+                        <label for="district" class="form-label">Select District</label>
+                        <select class="form-select" id="district" name="district">
+                            <option value="">Select District</option>
+                            {% for district in districts %}
+                            <option value="{{ district }}">{{ district }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Username will be auto-filled based on district selection</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+                
+                <div class="mt-4">
+                    <h6>Default Credentials:</h6>
+                    <div class="small text-muted">
+                        <div><strong>Admin:</strong> admin / admin123</div>
+                        <div><strong>Control Room:</strong> controlroom / controlroom123</div>
+                        <div><strong>District:</strong> {district_name} / {district_name}123</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('user_type').addEventListener('change', function() {
+    const userType = this.value;
+    const districtSelect = document.getElementById('district_select');
+    const usernameField = document.getElementById('username');
+    
+    if (userType === 'district') {
+        districtSelect.style.display = 'block';
+        usernameField.readOnly = true;
+    } else {
+        districtSelect.style.display = 'none';
+        usernameField.readOnly = false;
+        if (userType === 'admin') {
+            usernameField.value = 'admin';
+        } else if (userType === 'controlroom') {
+            usernameField.value = 'controlroom';
+        } else {
+            usernameField.value = '';
+        }
+    }
+});
+
+document.getElementById('district').addEventListener('change', function() {
+    const district = this.value;
+    const usernameField = document.getElementById('username');
+    
+    if (district) {
+        usernameField.value = district.toLowerCase().replace(/ /g, '_');
+    } else {
+        usernameField.value = '';
+    }
+});
+</script>
+{% endblock %}

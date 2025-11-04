@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}{{ form_config.name }} - Control Room DSR{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4><i class="fas fa-file-alt me-2"></i>{{ form_config.name }}</h4>
+                        <a href="{{ url_for('district.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Existing Entries Display -->
+                    {% if existing_entries %}
+                    <div class="mb-4">
+                        <h5 class="text-primary"><i class="fas fa-list me-2"></i>Existing Entries for Today</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Entry #</th>
+                                        <th>Time</th>
+                                        {% for field in form_config.fields[:3] %}
+                                        <th>{{ field.label }}</th>
+                                        {% endfor %}
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entry in existing_entries %}
+                                    <tr>
+                                        <td><span class="badge bg-primary">{{ loop.index }}</span></td>
+                                        <td>{{ entry.created_at.strftime('%H:%M') }}</td>
+                                        {% for field in form_config.fields[:3] %}
+                                        <td>{{ entry.data_dict.get(field.name, '-') }}</td>
+                                        {% endfor %}
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1 edit-entry-btn" data-entry-id="{{ entry.id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger delete-entry-btn" data-entry-id="{{ entry.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    {% endif %}
+
+                    <h5 class="text-success mb-3">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Entry
+                    </h5>
+
+                    <form method="POST" id="entryForm">
+                        <div class="mb-3">
+                            <label for="entry_date" class="form-label">Entry Date *</label>
+                            <input type="date" class="form-control" id="entry_date" name="entry_date" 
+                                   value="{{ today }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <input type="hidden" id="entry_id" name="entry_id" value="">
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="row">
+                            {% for field in form_config.fields %}
+                            <div class="{% if field.type == 'textarea' %}col-12{% else %}col-md-6{% endif %} mb-3">
+                                <label for="{{ field.name }}" class="form-label">
+                                    {{ field.label }}
+                                    {% if field.get('required') %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                
+                                {% if field.type == 'textarea' %}
+                                <textarea class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                          rows="3" placeholder="Enter {{ field.label.lower() }}"></textarea>
+                                {% elif field.type == 'number' %}
+                                <input type="number" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                       placeholder="Enter {{ field.label.lower() }}" min="0">
+                                {% elif field.type == 'date' %}
+                                <input type="date" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                       placeholder="Enter {{ field.label.lower() }}">
+                                {% else %}
+                                <input type="text" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                       placeholder="Enter {{ field.label.lower() }}">
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('district.dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            <div>
+                                <button type="button" class="btn btn-success me-2" id="addAnotherBtn">
+                                    <i class="fas fa-plus me-1"></i>Save & Add Another
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Save Entry
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-save functionality
+    let autoSaveTimer;
+    const formInputs = document.querySelectorAll('input, textarea, select');
+
+    formInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                // Show auto-save indicator
+                console.log('Auto-saving...');
+            }, 2000);
+        });
+    });
+
+    // Edit entry functionality
+    document.querySelectorAll('.edit-entry-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const entryId = this.getAttribute('data-entry-id');
+            editEntry(entryId);
+        });
+    });
+
+    // Delete entry functionality
+    document.querySelectorAll('.delete-entry-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const entryId = this.getAttribute('data-entry-id');
+            deleteEntry(entryId);
+        });
+    });
+
+    // Add another functionality
+    document.getElementById('addAnotherBtn')?.addEventListener('click', function() {
+        const form = document.getElementById('entryForm');
+        const formData = new FormData(form);
+        
+        // Submit form via AJAX and clear form for next entry
+        fetch(form.action || window.location.pathname, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Clear form for next entry
+                form.reset();
+                document.getElementById('entry_date').value = '{{ today }}';
+                document.getElementById('entry_id').value = '';
+                
+                // Show success message
+                showAlert('Entry saved successfully! Add another entry.', 'success');
+                
+                // Reload page to show updated entries list
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlert(data.message || 'Error saving entry', 'error');
+            }
+        })
+        .catch(error => {
+            showAlert('Error saving entry', 'error');
+            console.error('Error:', error);
+        });
+    });
+
+    // Form validation
+    document.getElementById('entryForm').addEventListener('submit', function(e) {
+        const entryDate = document.getElementById('entry_date').value;
+        if (!entryDate) {
+            e.preventDefault();
+            alert('Please select an entry date');
+            return false;
+        }
+        
+        // Show loading state
+        const submitBtn = document.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+        submitBtn.disabled = true;
+        
+        // Re-enable button after a delay (in case of errors)
+        setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }, 5000);
+    });
+});
+
+// Helper functions
+function editEntry(entryId) {
+    // Load entry data for editing
+    fetch(`/district/form/{{ form_type }}/edit/${entryId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Populate form with entry data
+                document.getElementById('entry_id').value = entryId;
+                const entryData = data.entry_data;
+                
+                // Fill form fields dynamically
+                Object.keys(entryData).forEach(fieldName => {
+                    const field = document.getElementById(fieldName);
+                    if (field) {
+                        field.value = entryData[fieldName] || '';
+                    }
+                });
+                
+                // Scroll to form
+                document.getElementById('entryForm').scrollIntoView({ behavior: 'smooth' });
+                showAlert('Entry loaded for editing', 'info');
+            }
+        })
+        .catch(error => {
+            showAlert('Error loading entry for edit', 'error');
+            console.error('Error:', error);
+        });
+}
+
+function deleteEntry(entryId) {
+    if (confirm('Are you sure you want to delete this entry?')) {
+        fetch(`/district/form/{{ form_type }}/delete/${entryId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Entry deleted successfully', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlert(data.message || 'Error deleting entry', 'error');
+            }
+        })
+        .catch(error => {
+            showAlert('Error deleting entry', 'error');
+            console.error('Error:', error);
+        });
+    }
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -260,5 +260,81 @@ function showAlert(message, type) {
         alertDiv.remove();
     }, 3000);
 }
+
+// ===== DYNAMIC DATE FUNCTIONALITY FOR CCTV FORM ONLY =====
+// This only affects cctv_installation_abstract form, all other forms unchanged
+function initializeDynamicDates() {
+    // Only execute for CCTV Installation Abstract form
+    if ('{{ form_type }}' !== 'cctv_installation_abstract') {
+        return; // Exit immediately for all other forms - NO CHANGES TO OTHER FORMS
+    }
+    
+    // Add event listener to date field (first date field in form)
+    const dateField = document.querySelector('input[type="date"]');
+    if (!dateField) return;
+    
+    // Set today's date as default
+    const today = new Date();
+    if (!dateField.value) {
+        dateField.value = today.toISOString().split('T')[0];
+    }
+    
+    // Update labels when date changes
+    dateField.addEventListener('change', function() {
+        updateCCTVLabels(this.value);
+    });
+    
+    // Initialize with current date
+    updateCCTVLabels(dateField.value || today.toISOString().split('T')[0]);
+}
+
+function updateCCTVLabels(selectedDate) {
+    if (!selectedDate) return;
+    
+    const entryDate = new Date(selectedDate);
+    
+    // Calculate required dates based on your requirements
+    const twoDaysBefore = new Date(entryDate);
+    twoDaysBefore.setDate(entryDate.getDate() - 2);
+    
+    const oneDayBefore = new Date(entryDate);
+    oneDayBefore.setDate(entryDate.getDate() - 1);
+    
+    // Format dates as DD.MM.YYYY
+    const formatDate = (date) => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    };
+    
+    const twoDaysBeforeStr = formatDate(twoDaysBefore);
+    const oneDayBeforeStr = formatDate(oneDayBefore);
+    
+    // Update only CCTV form labels - field mappings based on your requirements
+    const labelMappings = {
+        'cumulative_upto_01_11_2025': `Cumulative upto/Cameras installed by ${twoDaysBeforeStr}`,
+        'cameras_mapped_gis_02_11_2025': `How many Cameras mapped on GIS as on ${oneDayBeforeStr}`,
+        'cameras_installed_02_11_2025': `Cameras installed on ${oneDayBeforeStr}`,
+        'cumulative_upto_02_11_2025': `Cumulative upto ${oneDayBeforeStr}`,
+        'cities_villages_connected': `Number of cities/villages connected with CCTVs as on ${oneDayBeforeStr}`
+    };
+    
+    // Update labels safely
+    Object.keys(labelMappings).forEach(fieldName => {
+        const label = document.querySelector(`label[for="${fieldName}"]`);
+        if (label) {
+            // Preserve required asterisk if present
+            const hasRequired = label.innerHTML.includes('<span class="text-danger">*</span>');
+            label.innerHTML = labelMappings[fieldName] + (hasRequired ? '<span class="text-danger">*</span>' : '');
+        }
+    });
+}
+
+// Initialize when page loads (only for CCTV form)
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure form is fully loaded
+    setTimeout(initializeDynamicDates, 100);
+});
 </script>
 {% endblock %}

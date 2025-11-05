@@ -7,13 +7,13 @@ Please upload your logo files in this directory.
 ### Right Side Logo (Main Logo)
 - **File name:** `logo.png` (exactly this name)
 - **Location:** Right side of header
-- **Recommended size:** 200x60 pixels (or 3:1 ratio)
+- **Recommended size:** 250x75 pixels (or 3.33:1 ratio) - **25% bigger**
 - **Format:** PNG (for transparency support)
 
 ### Left Side Logo (Secondary Logo)
 - **File name:** `logo-left.png` (exactly this name)  
 - **Location:** Left side of header (before user menu)
-- **Recommended size:** 200x60 pixels (or 3:1 ratio) - **Same as right logo**
+- **Recommended size:** 250x75 pixels (or 3.33:1 ratio) - **Same as right logo**
 - **Format:** PNG (for transparency support)
 
 ## General Requirements:
@@ -34,4 +34,16 @@ Please upload your logo files in this directory.
 [Left Logo]  [User Menu] ←→ [CONTROL ROOM DSR] ←→ [Right Logo]
 ```
 
-Both logos are optional - you can upload one or both as needed.
+## Main Page Image:
+- **File name:** `main-image.png` (exactly this name)
+- **Location:** Main landing page right side
+- **Recommended size:** 500x400 pixels (or 5:4 ratio)
+- **Format:** PNG or JPG
+- **Content:** System screenshot, dashboard preview, or related imagery
+
+## Upload Files Needed:
+- `logo.png` - Right header logo (200x60px)
+- `logo-left.png` - Left header logo (200x60px) 
+- `main-image.png` - Main page hero image (500x400px)
+
+All files are optional - missing files will be auto-hidden or show fallback content.

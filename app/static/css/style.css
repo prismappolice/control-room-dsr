@@ -19,22 +19,13 @@ body {
 
 /* Hero Section */
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #ffff 100%);
     color: white;
     min-height: 100vh;
 }
 
 .hero-content {
     text-align: center;
-}
-
-.hero-icon {
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
 }
 
 .login-btn {
@@ -54,85 +45,78 @@ body {
     text-decoration: none;
 }
 
-/* System Mockup */
-.system-mockup {
+/* Main Hero Image */
+.main-image-container {
     position: relative;
-    max-width: 400px;
+    max-width: 500px;
     margin: 0 auto;
-}
-
-.mockup-screen {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    border-radius: 15px;
     overflow: hidden;
-    animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    animation: float 6s ease-in-out infinite;
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
+.main-hero-image {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
 }
 
-.mockup-header {
-    background: #f1f3f4;
-    padding: 1rem;
-    border-bottom: 1px solid #e0e0e0;
+.main-hero-image:hover {
+    transform: scale(1.05);
 }
 
-.mockup-dots {
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(13, 110, 253, 0.8), rgba(118, 75, 162, 0.8));
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.mockup-dots span {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #ccc;
+.main-image-container:hover .image-overlay {
+    opacity: 1;
 }
 
-.mockup-dots span:nth-child(1) { background: #ff5f56; }
-.mockup-dots span:nth-child(2) { background: #ffbd2e; }
-.mockup-dots span:nth-child(3) { background: #27ca3f; }
-
-.mockup-content {
-    padding: 2rem;
+.overlay-content {
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
 }
 
-.mockup-chart {
-    margin-bottom: 1.5rem;
+.main-image-container:hover .overlay-content {
+    transform: translateY(0);
 }
 
-.chart-bars {
-    display: flex;
-    align-items: end;
-    gap: 0.5rem;
-    height: 60px;
+/* Fallback when no image */
+.main-image-container:empty::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 300px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
 }
 
-.bar {
-    flex: 1;
-    background: linear-gradient(to top, var(--primary-color), var(--info-color));
-    border-radius: 2px 2px 0 0;
-    animation: grow 2s ease-in-out infinite;
-}
-
-@keyframes grow {
-    0%, 100% { transform: scaleY(1); }
-    50% { transform: scaleY(1.2); }
-}
-
-.mockup-forms {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.form-item {
-    height: 10px;
-    background: #e9ecef;
-    border-radius: 5px;
+.main-image-container:empty::after {
+    content: "📊 Control Room DSR System";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
 }
 
 /* Feature Cards */
@@ -390,7 +374,7 @@ body {
 }
 
 .navbar-left, .navbar-right {
-    min-height: 70px;
+    min-height: 85px;
     display: flex;
     align-items: center;
 }
@@ -420,8 +404,8 @@ body {
 @media (max-width: 768px) {
     .navbar-left, .navbar-right {
         width: auto !important;
-        min-width: 60px;
-        min-height: 60px;
+        min-width: 70px;
+        min-height: 70px;
     }
     
     .header-title {
@@ -429,8 +413,8 @@ body {
     }
     
     .header-logo {
-        max-height: 45px !important;
-        max-width: 120px !important;
+        max-height: 55px !important;
+        max-width: 150px !important;
     }
     
     .navbar {

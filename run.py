@@ -53,9 +53,5 @@ if __name__ == '__main__':
                 db.session.add(district_user)
         
         db.session.commit()
-        print("Database initialized with sample users!")
-        print("Admin credentials: admin / admin123")
-        print("Control Room credentials: controlroom / controlroom123")
-        print("District users: {district_name} / {district_name}123")
     
     app.run(debug=True, host='0.0.0.0', port=5000)

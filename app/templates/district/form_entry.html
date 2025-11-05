@@ -265,13 +265,20 @@ function showAlert(message, type) {
 // This only affects cctv_installation_abstract form, all other forms unchanged
 function initializeDynamicDates() {
     // Only execute for CCTV Installation Abstract form
+    console.log('Form type:', '{{ form_type }}');
     if ('{{ form_type }}' !== 'cctv_installation_abstract') {
+        console.log('Not CCTV form, exiting...');
         return; // Exit immediately for all other forms - NO CHANGES TO OTHER FORMS
     }
+    console.log('CCTV form detected, initializing dynamic dates...');
     
-    // Add event listener to date field (first date field in form)
-    const dateField = document.querySelector('input[type="date"]');
-    if (!dateField) return;
+    // Add event listener to entry date field
+    const dateField = document.getElementById('entry_date');
+    if (!dateField) {
+        console.log('Date field not found!');
+        return;
+    }
+    console.log('Date field found:', dateField.value);
     
     // Set today's date as default
     const today = new Date();
@@ -291,6 +298,7 @@ function initializeDynamicDates() {
 function updateCCTVLabels(selectedDate) {
     if (!selectedDate) return;
     
+    console.log('Updating CCTV labels for date:', selectedDate);
     const entryDate = new Date(selectedDate);
     
     // Calculate required dates based on your requirements
@@ -324,9 +332,12 @@ function updateCCTVLabels(selectedDate) {
     Object.keys(labelMappings).forEach(fieldName => {
         const label = document.querySelector(`label[for="${fieldName}"]`);
         if (label) {
+            console.log(`Updating label for ${fieldName}:`, labelMappings[fieldName]);
             // Preserve required asterisk if present
             const hasRequired = label.innerHTML.includes('<span class="text-danger">*</span>');
             label.innerHTML = labelMappings[fieldName] + (hasRequired ? '<span class="text-danger">*</span>' : '');
+        } else {
+            console.log(`Label not found for field: ${fieldName}`);
         }
     });
 }

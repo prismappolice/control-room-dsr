@@ -10,25 +10,46 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-shield-alt me-2"></i>Control Room DSR
-            </a>
-            
-            {% if current_user.is_authenticated %}
-            <div class="navbar-nav ms-auto">
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user me-1"></i>{{ current_user.username }}
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                        </a></li>
-                    </ul>
+        <div class="container-fluid">
+            <!-- Left side - Logo & User Menu -->
+            <div class="navbar-left" style="width: 250px;">
+                <div class="d-flex align-items-center justify-content-between w-100">
+                    <!-- User Menu - Positioned first (far left) -->
+                    {% if current_user.is_authenticated %}
+                    <div class="navbar-nav">
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>{{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div></div>
+                    {% endif %}
+                    
+                    <!-- Left Logo - Positioned closer to center -->
+                    <img src="{{ url_for('static', filename='images/logo-left.png') }}" alt="Left Logo" class="header-logo" 
+                         onerror="this.style.display='none'" style="max-height: 60px; max-width: 200px;">
                 </div>
             </div>
-            {% endif %}
+            
+            <!-- Center - Title -->
+            <div class="navbar-center flex-grow-1 text-center">
+                <a class="navbar-brand mx-auto header-title" href="{{ url_for('main.index') }}">
+                    Control Room DSR
+                </a>
+            </div>
+            
+            <!-- Right side - Logo -->
+            <div class="navbar-right" style="width: 250px; text-align: right;">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="header-logo" 
+                     onerror="this.style.display='none'" style="max-height: 60px; max-width: 200px;">
+            </div>
         </div>
     </nav>
 

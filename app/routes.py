@@ -37,7 +37,7 @@ def login():
         
         user = User.query.filter_by(username=username, user_type=user_type).first()
         
-        if user and check_password_hash(user.password, password):
+        if user and user.check_password(password):
             login_user(user)
             if user.user_type == 'admin':
                 return redirect(url_for('admin.dashboard'))
@@ -71,7 +71,7 @@ def dashboard():
     recent_uploads = ControlRoomUpload.query.order_by(ControlRoomUpload.uploaded_at.desc()).limit(5).all()
     
     # Get statistics
-    total_districts = len(DISTRICTS)
+    total_districts = 26  # Changed from len(DISTRICTS) to show 26 instead of 28
     total_forms = len(FORM_CONFIGS)
     today = date.today()
     today_entries = DSREntry.query.filter_by(date=today).count()
@@ -649,3 +649,47 @@ def view_upload(upload_id):
     except FileNotFoundError:
         flash('File not found', 'error')
         return redirect(url_for('district.controlroom_dashboard'))
+
+# Profile and Password Management Routes
+@auth_bp.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', user=current_user)
+
+@auth_bp.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+        
+        # Validate current password
+        if not current_user.check_password(current_password):
+            flash('Current password is incorrect', 'error')
+            return render_template('change_password.html')
+        
+        # Validate new password
+        if len(new_password) < 6:
+            flash('New password must be at least 6 characters long', 'error')
+            return render_template('change_password.html')
+        
+        if new_password != confirm_password:
+            flash('New password and confirmation do not match', 'error')
+            return render_template('change_password.html')
+        
+        # Update password
+        current_user.set_password(new_password)
+        db.session.commit()
+        
+        flash('Password changed successfully!', 'success')
+        
+        # Redirect based on user type
+        if current_user.user_type == 'admin':
+            return redirect(url_for('admin.dashboard'))
+        elif current_user.user_type == 'district':
+            return redirect(url_for('district.dashboard'))
+        elif current_user.user_type == 'controlroom':
+            return redirect(url_for('district.controlroom_dashboard'))
+    
+    return render_template('change_password.html')

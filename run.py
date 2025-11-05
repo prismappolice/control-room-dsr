@@ -9,15 +9,29 @@ if __name__ == '__main__':
         # Create tables
         db.create_all()
         
+        # Handle database migration for existing users (if any)
+        try:
+            # Check if there are users with old password format
+            existing_users = User.query.all()
+            for user in existing_users:
+                # If user doesn't have password_hash but has old-style data, it needs migration
+                if not hasattr(user, 'password_hash') or not user.password_hash:
+                    print(f"Note: Database migration needed for user {user.username}")
+                    print("Please run migrate_passwords.py script if upgrading from older version")
+                    break
+        except Exception:
+            # New installation, no migration needed
+            pass
+        
         # Create admin user if it doesn't exist
         admin = User.query.filter_by(username='admin', user_type='admin').first()
         if not admin:
             admin_user = User(
                 username='admin',
-                password=generate_password_hash('admin123'),
                 user_type='admin',
                 district_name=None
             )
+            admin_user.set_password('admin123')  # Use the new method
             db.session.add(admin_user)
         
         # Create control room user
@@ -25,10 +39,10 @@ if __name__ == '__main__':
         if not controlroom:
             controlroom_user = User(
                 username='controlroom',
-                password=generate_password_hash('controlroom123'),
                 user_type='controlroom',
                 district_name='Control Room'
             )
+            controlroom_user.set_password('controlroom123')  # Use the new method
             db.session.add(controlroom_user)
         
         # Create sample district users
@@ -46,10 +60,10 @@ if __name__ == '__main__':
             if not existing_user:
                 district_user = User(
                     username=username,
-                    password=generate_password_hash(f'{username}123'),
                     user_type='district',
                     district_name=district
                 )
+                district_user.set_password(f'{username}123')  # Use the new method
                 db.session.add(district_user)
         
         db.session.commit()

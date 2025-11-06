@@ -121,8 +121,23 @@ def form_view(form_type):
         flash('Invalid form type', 'error')
         return redirect(url_for('admin.dashboard'))
     
-    # Get all entries for this form type
-    entries = DSREntry.query.filter_by(form_type=form_type).order_by(DSREntry.date.desc()).all()
+    # Check for date filter parameter
+    filter_date = request.args.get('date')
+    
+    # Get entries for this form type with optional date filter
+    query = DSREntry.query.filter_by(form_type=form_type)
+    
+    if filter_date:
+        try:
+            # Parse the date string to ensure it's valid
+            from datetime import datetime
+            parsed_date = datetime.strptime(filter_date, '%Y-%m-%d').date()
+            query = query.filter_by(date=parsed_date)
+        except ValueError:
+            flash('Invalid date format', 'error')
+            return redirect(url_for('admin.dashboard'))
+    
+    entries = query.order_by(DSREntry.date.desc()).all()
     
     # Prepare data for display
     form_data = []
@@ -138,7 +153,8 @@ def form_view(form_type):
     return render_template('admin/form_view.html', 
                          form_type=form_type,
                          form_config=FORM_CONFIGS[form_type],
-                         form_data=form_data)
+                         form_data=form_data,
+                         filter_date=filter_date)
 
 @admin_bp.route('/search')
 @login_required

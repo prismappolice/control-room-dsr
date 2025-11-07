@@ -1,6 +1,12 @@
 // Control Room DSR JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Mobile header optimization
+    optimizeMobileHeader();
+    
+    // Handle window resize for header adjustments
+    window.addEventListener('resize', debounce(optimizeMobileHeader, 250));
+    
     // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -273,7 +279,99 @@ function printReport(elementId) {
     printWindow.document.close();
 }
 
+// Mobile header optimization
+function optimizeMobileHeader() {
+    const navbar = document.querySelector('.navbar');
+    const navbarLeft = document.querySelector('.navbar-left');
+    const navbarRight = document.querySelector('.navbar-right');
+    const navbarCenter = document.querySelector('.navbar-center');
+    const headerLogos = document.querySelectorAll('.header-logo');
+    
+    if (!navbar || !navbarLeft || !navbarRight || !navbarCenter) return;
+    
+    const screenWidth = window.innerWidth;
+    
+    // Adjust based on screen size
+    if (screenWidth <= 576) {
+        // Very small screens - minimize everything
+        headerLogos.forEach(logo => {
+            logo.style.maxHeight = '35px';
+            logo.style.maxWidth = '60px';
+        });
+        
+        // Adjust spacing
+        navbarLeft.style.paddingRight = '0.25rem';
+        navbarRight.style.paddingLeft = '0.25rem';
+        
+    } else if (screenWidth <= 768) {
+        // Small screens
+        headerLogos.forEach(logo => {
+            logo.style.maxHeight = '40px';
+            logo.style.maxWidth = '80px';
+        });
+        
+        navbarLeft.style.paddingRight = '0.5rem';
+        navbarRight.style.paddingLeft = '0.5rem';
+        
+    } else if (screenWidth <= 992) {
+        // Medium screens
+        headerLogos.forEach(logo => {
+            logo.style.maxHeight = '50px';
+            logo.style.maxWidth = '120px';
+        });
+        
+        navbarLeft.style.paddingRight = '0.75rem';
+        navbarRight.style.paddingLeft = '0.75rem';
+        
+    } else {
+        // Large screens - reset to default
+        headerLogos.forEach(logo => {
+            logo.style.maxHeight = '75px';
+            logo.style.maxWidth = '250px';
+        });
+        
+        navbarLeft.style.paddingRight = '1rem';
+        navbarRight.style.paddingLeft = '1rem';
+    }
+    
+    // Handle logo loading errors
+    headerLogos.forEach(logo => {
+        logo.addEventListener('error', function() {
+            this.style.display = 'none';
+        });
+        
+        logo.addEventListener('load', function() {
+            this.style.display = 'block';
+        });
+    });
+}
+
+// Check if images exist and handle gracefully
+function handleLogoFallbacks() {
+    const logos = document.querySelectorAll('.header-logo');
+    
+    logos.forEach(logo => {
+        const img = new Image();
+        img.onload = function() {
+            logo.style.opacity = '1';
+        };
+        img.onerror = function() {
+            logo.style.display = 'none';
+            // Adjust layout when logo is missing
+            const parent = logo.closest('.navbar-left, .navbar-right');
+            if (parent) {
+                parent.style.minWidth = '40px';
+            }
+        };
+        img.src = logo.src;
+    });
+}
+
+// Call on page load
+document.addEventListener('DOMContentLoaded', handleLogoFallbacks);
+
 // Export functions for global use
 window.showAlert = showAlert;
 window.submitFormWithLoading = submitFormWithLoading;
 window.printReport = printReport;
+window.optimizeMobileHeader = optimizeMobileHeader;

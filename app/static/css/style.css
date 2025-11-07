@@ -404,22 +404,160 @@ body {
 @media (max-width: 768px) {
     .navbar-left, .navbar-right {
         width: auto !important;
-        min-width: 70px;
-        min-height: 70px;
+        min-width: 80px;
+        min-height: 60px;
+        padding: 0.25rem !important;
+        flex: 0 0 auto !important;
+    }
+    
+    .navbar-left {
+        padding-right: 0.5rem !important;
+    }
+    
+    .navbar-right {
+        padding-left: 0.5rem !important;
+    }
+    
+    .header-title {
+        font-size: 1.4rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+    }
+    
+    .header-logo {
+        max-height: 45px !important;
+        max-width: 100px !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+        display: block !important;
+    }
+}
+
+/* iPad Air Specific Fix (820x1180) */
+@media (min-width: 769px) and (max-width: 834px) and (min-height: 1000px) {
+    .navbar-left, .navbar-right {
+        width: auto !important;
+        min-width: 100px;
+        padding: 0.5rem !important;
+        flex: 0 0 auto !important;
+    }
+    
+    .navbar-right .d-flex {
+        gap: 1rem !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+    }
+    
+    .header-logo {
+        max-height: 50px !important;
+        max-width: 120px !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+        display: block !important;
+        flex-shrink: 0 !important;
     }
     
     .header-title {
         font-size: 1.6rem !important;
     }
-    
-    .header-logo {
-        max-height: 55px !important;
-        max-width: 150px !important;
-    }
-    
     .navbar {
         padding-top: 0.75rem !important;
         padding-bottom: 0.75rem !important;
+    }
+}
+
+/* Extra Mobile Responsiveness for Logo Display */
+@media (max-width: 576px) {
+    .navbar-left, .navbar-right {
+        width: auto !important;
+        min-width: 50px;
+        min-height: 50px;
+        padding: 0.2rem !important;
+        flex: 0 0 auto !important;
+    }
+    
+    .navbar-left {
+        padding-right: 0.25rem !important;
+    }
+    
+    .navbar-right {
+        padding-left: 0.25rem !important;
+    }
+    
+    .navbar-right .d-flex {
+        gap: 0.5rem !important;
+        justify-content: flex-end !important;
+    }
+    
+    .header-title {
+        font-size: 1.1rem !important;
+        padding: 0 0.3rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    
+    .header-logo {
+        max-height: 35px !important;
+        max-width: 70px !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+        display: block !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .navbar {
+        padding-top: 0.4rem !important;
+        padding-bottom: 0.4rem !important;
+    }
+    
+    .navbar-center {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+    
+    /* Ensure user dropdown is visible */
+    .dropdown-menu {
+        min-width: 150px !important;
+        right: 0 !important;
+        left: auto !important;
+    }
+}
+
+/* Ultra Small Mobile Devices - Prevent Logo Overlap */
+@media (max-width: 400px) {
+    .navbar-left, .navbar-right {
+        width: auto !important;
+        min-width: 35px;
+        padding: 0.1rem !important;
+        flex: 0 0 auto !important;
+    }
+    
+    .navbar-right .d-flex {
+        gap: 0.3rem !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+    }
+    
+    .header-title {
+        font-size: 0.9rem !important;
+        padding: 0 0.2rem !important;
+        letter-spacing: 0 !important;
+    }
+    
+    .header-logo {
+        max-height: 28px !important;
+        max-width: 50px !important;
+        flex-shrink: 0 !important;
+        display: block !important;
+    }
+    
+    .navbar {
+        padding-top: 0.3rem !important;
+        padding-bottom: 0.3rem !important;
     }
 }
 

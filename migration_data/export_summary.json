@@ -1,0 +1,12 @@
+{
+  "export_date": "2025-11-07T11:28:08.738077",
+  "database_path": "D:\\control room DSR\\instance\\control_room_dsr.db",
+  "export_directory": "D:\\control room DSR\\migration_data",
+  "tables_exported": {
+    "users": 32,
+    "dsr_entries": 15,
+    "control_room_uploads": 1
+  },
+  "total_records": 48,
+  "export_status": "completed"
+}

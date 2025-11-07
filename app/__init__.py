@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
+from config import Config
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -9,12 +10,12 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__)
     
-    # Configuration
-    app.config['SECRET_KEY'] = 'your-secret-key-here-change-in-production'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///control_room_dsr.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'uploads')
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+    # Load configuration from config.py (supports both SQLite and PostgreSQL)
+    app.config.from_object(Config)
+    
+    # Backwards compatibility: if no DATABASE_TYPE set, use SQLite (current behavior)
+    if 'SQLALCHEMY_DATABASE_URI' not in app.config or not app.config['SQLALCHEMY_DATABASE_URI']:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///control_room_dsr.db'
     
     # Initialize extensions
     db.init_app(app)

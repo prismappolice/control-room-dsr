@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "crime_data",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"crime_head\": \"other ipc & social media\", \"fir_no\": \"89/2025 U/s196(1),352,353(2)BNS,67ITA-2000-2008 of Itchapuram Rural PS\", \"facts_of_case\": \"occured on 2/11/2025 at 7.30 hrs on gopal sisitu having face book accouunt and reported at 02.11.2025at 16.00 hrs.that the complaints kandendla narayana s/0 kondaiah.\", \"accused_status\": \"gopi sistu\", \"action_taken\": \"yet to be arrested\", \"legal_progress\": \"nil\"}",
+    "created_at": "2025-11-04 09:47:14.857595",
+    "updated_at": "2025-11-04 09:47:14.857600"
+  },
+  {
+    "id": 2,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "nbw_status",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"pending\": \"306\", \"executed_today\": \"0\", \"one_week_total\": \"0\", \"one_month_total\": \"0\", \"remarks\": \"nil\"}",
+    "created_at": "2025-11-04 09:48:27.805467",
+    "updated_at": "2025-11-04 09:48:27.805478"
+  },
+  {
+    "id": 3,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "pd_act_proposals",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"case_no\": \"97/D2/DCRB/SKL/2025\", \"accused_profile\": \"mondavalasa chiranjeevi s/o late appa rao 63 years faridapeta village,etcherla mandal\", \"crime_type\": \"bodily offences\", \"grounds_for_proposal\": \"involvement in body offences\", \"current_status\": \"as per the proceedings rc no 2526/2025/c5 dt 15/10/2025 of the collector and district magistrate srikakulam district\", \"remarks\": \"now he was in jail\"}",
+    "created_at": "2025-11-04 09:51:38.691621",
+    "updated_at": "2025-11-04 09:51:38.691624"
+  },
+  {
+    "id": 4,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "externment_actions",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"accused_gang\": \"nil\", \"activity_profile\": \"nil\", \"legal_grounds\": \"nil\", \"jurisdiction_ps\": \"nil\", \"status\": \"nil\", \"date\": \"nil\", \"remarks\": \"nil\"}",
+    "created_at": "2025-11-04 09:52:33.571093",
+    "updated_at": "2025-11-04 09:54:22.100870"
+  },
+  {
+    "id": 5,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "sensitive_cases",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"fir_no\": \"51/2025\", \"case_category\": \"political\", \"crime_head\": \"others\", \"summary\": \"occured on 16.10.2025 at about 11.50 hrs at bestapalem road hari..\", \"todays_progress\": \"nil\", \"pending_action\": \"some more witness have been examined\", \"risk_flag\": \"nil\", \"lead_officer\": \"si podili\"}",
+    "created_at": "2025-11-04 09:56:59.195616",
+    "updated_at": "2025-11-04 09:56:59.195621"
+  },
+  {
+    "id": 6,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "vc_productions",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"nil\", \"no_produced\": \"\", \"mode\": \"nil\", \"courts_covered\": \"\", \"issues_faced\": \"nil\", \"mitigation_steps\": \"nil\"}",
+    "created_at": "2025-11-04 09:57:44.248293",
+    "updated_at": "2025-11-04 09:57:44.248314"
+  },
+  {
+    "id": 7,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "cctv_surveillance",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"installed_today\": \"0\", \"total_this_month\": \"10\", \"command_centre_integrated\": \"yes\", \"capabilities\": \"night vision\", \"maintenance_issues\": \"nil\"}",
+    "created_at": "2025-11-04 09:59:09.889771",
+    "updated_at": "2025-11-04 09:59:09.889775"
+  },
+  {
+    "id": 8,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "cyber_crime_monitoring",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"complaints_today\": \"2\", \"firs_registered\": \"\", \"crime_type\": \"fake insta account\", \"financial_impact\": \"nil\", \"progress\": \"under investigation\", \"agency_support_required\": \"nil\"}",
+    "created_at": "2025-11-04 10:00:14.591656",
+    "updated_at": "2025-11-04 10:00:14.591660"
+  },
+  {
+    "id": 9,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "womens_safety",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"domestic_violence\": \"1\", \"eve_teasing\": \"0\", \"sexual_harassment\": \"0\", \"no_received\": \"1\", \"avg_response_time\": \"8min\", \"firs\": \"0\", \"shakti_team_action\": \"nil\", \"community_feedback\": \"positive\"}",
+    "created_at": "2025-11-04 10:03:36.659894",
+    "updated_at": "2025-11-04 10:03:36.659899"
+  },
+  {
+    "id": 10,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "focus_area",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"nil\", \"date\": \"nil\", \"theme_problem_area\": \"nil\", \"expected_officer_response\": \"nil\", \"actual_compliance\": \"nil\", \"gaps_identified\": \"nil\"}",
+    "created_at": "2025-11-04 10:04:12.221269",
+    "updated_at": "2025-11-04 10:04:12.221273"
+  },
+  {
+    "id": 11,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "legal_monitoring",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"case_name\": \"92/2023 u/s 376-ab ipc sec 5(k)r/w POCSO act\", \"court_bench\": \"POCSO court prakasam\", \"next_hearing_date\": \"22-10-2025\", \"relief_sought\": \"nil\", \"police_action_required\": \"nil\"}",
+    "created_at": "2025-11-04 10:06:34.353161",
+    "updated_at": "2025-11-04 10:06:34.353165"
+  },
+  {
+    "id": 12,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "one_page_dsr",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"vvip_movements_law_order\": \"nil\", \"crime_important\": \"nil\", \"nbw_pd_externment\": \"nil\", \"cyber_crime\": \"nil\", \"womens_safety\": \"nil\", \"sensitive_cases\": \"nil\", \"cctv_surveillance\": \"target 3000,installed 2993,installed this month-09,today -nill\", \"legal_issues\": \"nil\", \"focus_area_progress\": \"nil\"}",
+    "created_at": "2025-11-04 10:08:17.536895",
+    "updated_at": "2025-11-04 10:08:17.536899"
+  },
+  {
+    "id": 13,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "cctv_ps_status",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"no_of_police_stations\": \"27\", \"total_cctv_installed\": \"27\", \"cameras_functioning\": \"27\", \"cameras_not_functioning\": \"0\", \"action_taken_complaints\": \"nil\", \"ps_footage_stored\": \"\", \"remarks\": \"nil\"}",
+    "created_at": "2025-11-04 10:08:48.943545",
+    "updated_at": "2025-11-04 10:08:48.943549"
+  },
+  {
+    "id": 14,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "uo_availability",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"remarks\": \"available at hq\"}",
+    "created_at": "2025-11-04 10:09:22.235037",
+    "updated_at": "2025-11-04 10:09:22.235041"
+  },
+  {
+    "id": 15,
+    "user_id": 10,
+    "district_name": "Prakasam",
+    "form_type": "cctv_installation_abstract",
+    "date": "2025-11-04",
+    "data": "{\"unit_name\": \"prakasam\", \"apportioned_target\": \"3000\", \"cumulative_upto_01_11_2025\": \"2500\", \"cameras_mapped_gis_02_11_2025\": \"1500\", \"cameras_installed_02_11_2025\": \"10\", \"cumulative_upto_02_11_2025\": \"2510\", \"to_be_completed_31_march_2025\": \"3000\", \"cities_villages_connected\": \"25\"}",
+    "created_at": "2025-11-04 10:10:23.855958",
+    "updated_at": "2025-11-04 10:10:23.855962"
+  }
+]

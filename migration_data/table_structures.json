@@ -1,0 +1,183 @@
+{
+  "user": [
+    {
+      "name": "id",
+      "type": "INTEGER",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 1
+    },
+    {
+      "name": "username",
+      "type": "VARCHAR(80)",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "password",
+      "type": "VARCHAR(120)",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "user_type",
+      "type": "VARCHAR(20)",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "district_name",
+      "type": "VARCHAR(100)",
+      "notnull": 0,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "is_active",
+      "type": "BOOLEAN",
+      "notnull": 0,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "created_at",
+      "type": "DATETIME",
+      "notnull": 0,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "password_hash",
+      "type": "VARCHAR(255)",
+      "notnull": 0,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "last_password_change",
+      "type": "DATETIME",
+      "notnull": 0,
+      "default_value": null,
+      "primary_key": 0
+    }
+  ],
+  "dsr_entry": [
+    {
+      "name": "id",
+      "type": "INTEGER",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 1
+    },
+    {
+      "name": "district_name",
+      "type": "VARCHAR(100)",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "form_type",
+      "type": "VARCHAR(50)",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "date",
+      "type": "DATE",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "data",
+      "type": "TEXT",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "created_at",
+      "type": "DATETIME",
+      "notnull": 0,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "updated_at",
+      "type": "DATETIME",
+      "notnull": 0,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "user_id",
+      "type": "INTEGER",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    }
+  ],
+  "control_room_upload": [
+    {
+      "name": "id",
+      "type": "INTEGER",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 1
+    },
+    {
+      "name": "date",
+      "type": "DATE",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "upload_type",
+      "type": "VARCHAR(50)",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "filename",
+      "type": "VARCHAR(255)",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "original_filename",
+      "type": "VARCHAR(255)",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "file_path",
+      "type": "VARCHAR(500)",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "uploaded_at",
+      "type": "DATETIME",
+      "notnull": 0,
+      "default_value": null,
+      "primary_key": 0
+    },
+    {
+      "name": "user_id",
+      "type": "INTEGER",
+      "notnull": 1,
+      "default_value": null,
+      "primary_key": 0
+    }
+  ]
+}

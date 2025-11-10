@@ -166,6 +166,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Submit form via AJAX and clear form for next entry
         fetch(form.action || window.location.pathname, {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formData
         })
         .then(response => response.json())
@@ -191,11 +194,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Form validation
+    // Form validation and AJAX submission
     document.getElementById('entryForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
         const entryDate = document.getElementById('entry_date').value;
         if (!entryDate) {
-            e.preventDefault();
             alert('Please select an entry date');
             return false;
         }
@@ -206,11 +210,40 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
         submitBtn.disabled = true;
         
-        // Re-enable button after a delay (in case of errors)
-        setTimeout(() => {
+        // Submit form via AJAX
+        const formData = new FormData(this);
+        
+        fetch(this.action || window.location.pathname, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Reset button state
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-        }, 5000);
+            
+            if (data.success) {
+                // Show success message
+                showAlert('Entry saved successfully!', 'success');
+                
+                // Reload page to show updated entries list
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlert(data.message || 'Error saving entry', 'error');
+            }
+        })
+        .catch(error => {
+            // Reset button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            showAlert('Error saving entry', 'error');
+            console.error('Error:', error);
+        });
     });
 });
 

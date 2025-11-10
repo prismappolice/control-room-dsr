@@ -53,27 +53,9 @@
                                             <h6 class="mb-0">{{ forms.get(entry.form_type, {}).get('name', entry.form_type) }}</h6>
                                         </div>
                                         <div class="card-body">
-                                            <div class="row" id="entry-{{ entry.id }}">
+                                            <div class="row" id="entry-{{ entry.id }}" data-entry-data="{{ entry.data | e }}">
                                                 <!-- Data will be populated by JavaScript -->
                                             </div>
-                                            <script>
-                                                try {
-                                                    const data = JSON.parse('{{ entry.data | safe }}');
-                                                    const container = document.getElementById('entry-{{ entry.id }}');
-                                                    let html = '';
-                                                    for (const [key, value] of Object.entries(data)) {
-                                                        html += `
-                                                            <div class="col-md-6 mb-2">
-                                                                <strong>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</strong>
-                                                                <span>${value || 'N/A'}</span>
-                                                            </div>
-                                                        `;
-                                                    }
-                                                    container.innerHTML = html;
-                                                } catch (e) {
-                                                    document.getElementById('entry-{{ entry.id }}').innerHTML = '<div class="text-danger">Error parsing data</div>';
-                                                }
-                                            </script>
                                             <div class="mt-3">
                                                 <small class="text-muted">
                                                     Last updated: {{ entry.updated_at.strftime('%d-%m-%Y %H:%M') }}
@@ -100,5 +82,57 @@
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Process all entry data containers
+    var entryContainers = document.querySelectorAll('[data-entry-data]');
+    
+    entryContainers.forEach(function(container) {
+        try {
+            var entryDataStr = container.getAttribute('data-entry-data');
+            var parsedData;
+            
+            // Parse JSON data
+            if (entryDataStr) {
+                parsedData = JSON.parse(entryDataStr);
+            } else {
+                parsedData = {};
+            }
+            
+            var html = '';
+            
+            // Generate HTML for each data field
+            for (var key in parsedData) {
+                if (parsedData.hasOwnProperty(key)) {
+                    var value = parsedData[key] || 'N/A';
+                    var displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, function(l) { 
+                        return l.toUpperCase(); 
+                    });
+                    var safeValue = String(value).replace(/[<>&"']/g, function(m) {
+                        return {
+                            '<': '&lt;',
+                            '>': '&gt;',
+                            '&': '&amp;',
+                            '"': '&quot;',
+                            "'": '&#39;'
+                        }[m];
+                    });
+                    
+                    html += '<div class="col-md-6 mb-2">' +
+                           '<strong>' + displayKey + ':</strong> ' +
+                           '<span>' + safeValue + '</span>' +
+                           '</div>';
+                }
+            }
+            
+            container.innerHTML = html;
+            
+        } catch (e) {
+            console.error('Error parsing entry data:', e);
+            container.innerHTML = '<div class="text-danger">Error displaying data</div>';
+        }
+    });
+});
+</script>
 
 {% endblock %}

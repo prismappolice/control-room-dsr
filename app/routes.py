@@ -496,8 +496,10 @@ def form_entry(form_type):
             db.session.commit()
             flash('New entry added successfully', 'success')
         
-        # Handle AJAX requests for "Add Another" functionality
-        if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded':
+        # Handle AJAX requests (check for XMLHttpRequest header or JSON response preference)
+        if (request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 
+            'application/json' in request.headers.get('Accept', '') or
+            request.form.get('ajax_request') == 'true'):
             return jsonify({'success': True, 'message': 'Entry saved successfully'})
         
         return redirect(url_for('district.dashboard'))

@@ -226,32 +226,141 @@ def download_dsr(district_name, date_str):
     ws.merge_cells('A1:D1')
     ws.merge_cells('A2:D2')
     
-    row = 4
+    # Group entries by form type (same logic as web interface)
+    entries_by_form = {}
     for entry in entries:
-        form_config = FORM_CONFIGS.get(entry.form_type, {})
-        form_name = form_config.get('name', entry.form_type)
+        form_type = entry.form_type
+        if form_type not in entries_by_form:
+            entries_by_form[form_type] = []
+        entries_by_form[form_type].append(entry)
+    
+    row = 4
+    for form_type, form_entries in entries_by_form.items():
+        form_config = FORM_CONFIGS.get(form_type, {})
+        form_name = form_config.get('name', form_type)
+        entry_count = len(form_entries)
         
-        # Form header
-        ws[f'A{row}'] = form_name
+        # Form header with entry count
+        header_text = f"{form_name} ({entry_count} {'entry' if entry_count == 1 else 'entries'})"
+        ws[f'A{row}'] = header_text
         ws[f'A{row}'].font = header_font
         ws[f'A{row}'].fill = header_fill
-        ws.merge_cells(f'A{row}:D{row}')
-        row += 1
         
-        # Form data
-        data = json.loads(entry.data)
+        # Use horizontal table format for all entries (consistent professional format)
+        # Get field names and filter fields that have values
         fields = form_config.get('fields', [])
-        
+        used_fields = []
         for field in fields:
             field_name = field['name']
-            field_label = field['label']
-            value = data.get(field_name, '')
+            has_value = any(json.loads(entry.data).get(field_name, '') for entry in form_entries)
+            if has_value:
+                used_fields.append(field)
+        
+        # Calculate merge range for header
+        max_col = len(used_fields) + 2  # +2 for S.No and Time columns
+        end_col = chr(ord('A') + max_col - 1)
+        ws.merge_cells(f'A{row}:{end_col}{row}')
+        row += 1
+        
+        # Table headers
+        col = 0
+        ws.cell(row=row, column=col+1, value="S.No").font = Font(bold=True)
+        ws.cell(row=row, column=col+1).fill = PatternFill(start_color="E6E6E6", end_color="E6E6E6", fill_type="solid")
+        ws.cell(row=row, column=col+1).border = thin_border
+        col += 1
+        
+        ws.cell(row=row, column=col+1, value="Time").font = Font(bold=True)
+        ws.cell(row=row, column=col+1).fill = PatternFill(start_color="E6E6E6", end_color="E6E6E6", fill_type="solid")
+        ws.cell(row=row, column=col+1).border = thin_border
+        col += 1
+        
+        for field in used_fields:
+            ws.cell(row=row, column=col+1, value=field['label']).font = Font(bold=True)
+            ws.cell(row=row, column=col+1).fill = PatternFill(start_color="E6E6E6", end_color="E6E6E6", fill_type="solid")
+            ws.cell(row=row, column=col+1).border = thin_border
+            col += 1
+        row += 1
+        
+        # Data rows (works for both single and multiple entries)
+        for idx, entry in enumerate(form_entries):
+            data = json.loads(entry.data)
+            col = 0
             
-            ws[f'A{row}'] = field_label
-            ws[f'B{row}'] = value
-            ws[f'A{row}'].border = thin_border
-            ws[f'B{row}'].border = thin_border
+            # Serial number
+            ws.cell(row=row, column=col+1, value=idx+1).border = thin_border
+            col += 1
+            
+            # Time (extract from updated_at)
+            time_str = entry.updated_at.strftime('%H:%M') if entry.updated_at else 'N/A'
+            ws.cell(row=row, column=col+1, value=time_str).border = thin_border
+            col += 1
+            
+            # Field values
+            for field in used_fields:
+                field_name = field['name']
+                value = data.get(field_name, '')
+                ws.cell(row=row, column=col+1, value=value or '-').border = thin_border
+                col += 1
             row += 1
+            # Multiple entries: Use horizontal table format
+            # Get field names from first entry to determine column count
+            first_entry_data = json.loads(form_entries[0].data)
+            fields = form_config.get('fields', [])
+            
+            # Filter fields that have values in at least one entry
+            used_fields = []
+            for field in fields:
+                field_name = field['name']
+                has_value = any(json.loads(entry.data).get(field_name, '') for entry in form_entries)
+                if has_value:
+                    used_fields.append(field)
+            
+            # Calculate merge range for header
+            max_col = len(used_fields) + 2  # +2 for S.No and Time columns
+            end_col = chr(ord('A') + max_col - 1)
+            ws.merge_cells(f'A{row}:{end_col}{row}')
+            row += 1
+            
+            # Table headers
+            col = 0
+            ws.cell(row=row, column=col+1, value="S.No").font = Font(bold=True)
+            ws.cell(row=row, column=col+1).fill = PatternFill(start_color="E6E6E6", end_color="E6E6E6", fill_type="solid")
+            ws.cell(row=row, column=col+1).border = thin_border
+            col += 1
+            
+            ws.cell(row=row, column=col+1, value="Time").font = Font(bold=True)
+            ws.cell(row=row, column=col+1).fill = PatternFill(start_color="E6E6E6", end_color="E6E6E6", fill_type="solid")
+            ws.cell(row=row, column=col+1).border = thin_border
+            col += 1
+            
+            for field in used_fields:
+                ws.cell(row=row, column=col+1, value=field['label']).font = Font(bold=True)
+                ws.cell(row=row, column=col+1).fill = PatternFill(start_color="E6E6E6", end_color="E6E6E6", fill_type="solid")
+                ws.cell(row=row, column=col+1).border = thin_border
+                col += 1
+            row += 1
+            
+            # Data rows
+            for idx, entry in enumerate(form_entries):
+                data = json.loads(entry.data)
+                col = 0
+                
+                # Serial number
+                ws.cell(row=row, column=col+1, value=idx+1).border = thin_border
+                col += 1
+                
+                # Time (extract from updated_at)
+                time_str = entry.updated_at.strftime('%H:%M') if entry.updated_at else 'N/A'
+                ws.cell(row=row, column=col+1, value=time_str).border = thin_border
+                col += 1
+                
+                # Field values
+                for field in used_fields:
+                    field_name = field['name']
+                    value = data.get(field_name, '')
+                    ws.cell(row=row, column=col+1, value=value or '-').border = thin_border
+                    col += 1
+                row += 1
         
         row += 1  # Empty row between forms
     

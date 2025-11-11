@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from app.models import User, DSREntry, ControlRoomUpload, FORM_CONFIGS, DISTRICTS
 from app import db, login_manager
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import os
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
@@ -568,6 +568,22 @@ def form_entry(form_type):
                                  form_type=form_type, 
                                  form_config=form_config)
         
+        # Date validation: Allow only today and yesterday
+        today = date.today()
+        yesterday = today - timedelta(days=1)
+        
+        if entry_date_obj > today:
+            flash('Future dates are not allowed for DSR entries', 'error')
+            return render_template('district/form_entry.html', 
+                                 form_type=form_type, 
+                                 form_config=form_config)
+        
+        if entry_date_obj < yesterday:
+            flash('Only today and yesterday entries are allowed', 'error')
+            return render_template('district/form_entry.html', 
+                                 form_type=form_type, 
+                                 form_config=form_config)
+        
         # Collect form data
         form_data = {}
         for field in form_config['fields']:
@@ -615,6 +631,7 @@ def form_entry(form_type):
     
     # For GET request, get all existing entries for today
     today = date.today()
+    yesterday = today - timedelta(days=1)
     existing_entries = DSREntry.query.filter_by(
         district_name=current_user.district_name,
         form_type=form_type,
@@ -629,7 +646,8 @@ def form_entry(form_type):
                          form_type=form_type, 
                          form_config=form_config,
                          existing_entries=existing_entries,
-                         today=today.strftime('%Y-%m-%d'))
+                         today=today.strftime('%Y-%m-%d'),
+                         yesterday=yesterday.strftime('%Y-%m-%d'))
 
 @district_bp.route('/form/<form_type>/edit/<int:entry_id>')
 @login_required

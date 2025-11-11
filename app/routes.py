@@ -431,7 +431,7 @@ def filter_uploads():
             'original_filename': upload.original_filename,
             'upload_type': upload.upload_type,
             'upload_date': upload.date.strftime('%d-%m-%Y'),
-            'uploaded_at': upload.uploaded_at.strftime('%d-%m-%Y %H:%M')
+            'uploaded_at': upload.get_ist_uploaded_at().strftime('%d-%m-%Y %H:%M')
         })
     
     return jsonify(upload_list)
@@ -463,7 +463,7 @@ def upload_details(upload_id):
         'original_filename': upload.original_filename,
         'upload_type': upload.upload_type,
         'upload_date': upload.date.strftime('%d-%m-%Y'),
-        'uploaded_at': upload.uploaded_at.strftime('%d-%m-%Y %H:%M'),
+        'uploaded_at': upload.get_ist_uploaded_at().strftime('%d-%m-%Y %H:%M'),
         'file_size': file_size,
         'uploaded_by': 'Control Room'
     })

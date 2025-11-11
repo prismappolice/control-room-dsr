@@ -173,7 +173,7 @@
                                     <td>{{ upload.original_filename }}</td>
                                     <td><span class="badge bg-info">{{ upload.upload_type }}</span></td>
                                     <td>{{ upload.date.strftime('%d-%m-%Y') }}</td>
-                                    <td>{{ upload.uploaded_at.strftime('%d-%m-%Y %H:%M') }}</td>
+                                    <td>{{ upload.get_ist_uploaded_at().strftime('%d-%m-%Y %H:%M') }}</td>
                                     <td>
                                         <a href="{{ url_for('admin.download_upload', upload_id=upload.id) }}" 
                                            class="btn btn-sm btn-outline-success me-1">

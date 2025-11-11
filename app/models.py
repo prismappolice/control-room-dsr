@@ -1,8 +1,16 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
+import pytz
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
+
+# Indian Standard Time timezone
+IST = pytz.timezone('Asia/Kolkata')
+
+def ist_now():
+    """Get current time in Indian Standard Time"""
+    return datetime.now(IST).replace(tzinfo=None)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -11,13 +19,13 @@ class User(UserMixin, db.Model):
     user_type = db.Column(db.String(20), nullable=False)  # 'admin', 'district', 'controlroom'
     district_name = db.Column(db.String(100), nullable=True)  # For district users
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    last_password_change = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=ist_now)
+    last_password_change = db.Column(db.DateTime, default=ist_now)
     
     def set_password(self, password):
         """Set password hash"""
         self.password_hash = generate_password_hash(password)
-        self.last_password_change = datetime.utcnow()
+        self.last_password_change = ist_now()
     
     def check_password(self, password):
         """Check password against hash"""
@@ -40,8 +48,8 @@ class DSREntry(db.Model):
     form_type = db.Column(db.String(50), nullable=False)
     date = db.Column(db.Date, nullable=False)
     data = db.Column(db.Text, nullable=False)  # JSON string of form data
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=ist_now)
+    updated_at = db.Column(db.DateTime, default=ist_now, onupdate=ist_now)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class ControlRoomUpload(db.Model):

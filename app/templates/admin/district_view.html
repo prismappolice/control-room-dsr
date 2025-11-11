@@ -47,20 +47,58 @@
                             <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" 
                                  data-bs-parent="#dsrAccordion">
                                 <div class="accordion-body">
+                                    {% set entries_by_form = {} %}
                                     {% for entry in entries %}
-                                    <div class="card mb-3">
+                                        {% set form_type = entry.form_type %}
+                                        {% if form_type not in entries_by_form %}
+                                            {% set _ = entries_by_form.update({form_type: []}) %}
+                                        {% endif %}
+                                        {% set _ = entries_by_form[form_type].append(entry) %}
+                                    {% endfor %}
+                                    
+                                    {% for form_type, form_entries in entries_by_form.items() %}
+                                    <div class="card mb-4">
                                         <div class="card-header">
-                                            <h6 class="mb-0">{{ forms.get(entry.form_type, {}).get('name', entry.form_type) }}</h6>
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-file-alt me-2"></i>
+                                                {{ forms.get(form_type, {}).get('name', form_type) }}
+                                                <span class="badge bg-primary ms-2">{{ form_entries|length }} entr{{ 'y' if form_entries|length == 1 else 'ies' }}</span>
+                                            </h6>
                                         </div>
                                         <div class="card-body">
-                                            <div class="row" id="entry-{{ entry.id }}" data-entry-data="{{ entry.data | e }}">
-                                                <!-- Data will be populated by JavaScript -->
-                                            </div>
-                                            <div class="mt-3">
-                                                <small class="text-muted">
-                                                    Last updated: {{ entry.updated_at.strftime('%d-%m-%Y %H:%M') }}
-                                                </small>
-                                            </div>
+                                            {% if form_entries|length == 1 %}
+                                                <!-- Single entry: Show in grid format -->
+                                                <div class="row" id="entry-{{ form_entries[0].id }}" data-entry-data="{{ form_entries[0].data | e }}">
+                                                    <!-- Data will be populated by JavaScript -->
+                                                </div>
+                                                <div class="mt-3">
+                                                    <small class="text-muted">
+                                                        Last updated: {{ form_entries[0].updated_at.strftime('%d-%m-%Y %H:%M') }}
+                                                    </small>
+                                                </div>
+                                            {% else %}
+                                                <!-- Multiple entries: Show in table format -->
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover" id="form-table-{{ form_type.replace('_', '-') }}">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th width="50">S.No</th>
+                                                                <th width="80">Time</th>
+                                                                <!-- Field headers will be populated by JavaScript -->
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for entry in form_entries %}
+                                                            <tr data-entry-data="{{ entry.data | e }}" data-entry-time="{{ entry.updated_at.strftime('%H:%M') }}" data-serial="{{ loop.index }}">
+                                                                <td><span class="badge bg-secondary">{{ loop.index }}</span></td>
+                                                                <td><small class="text-muted">{{ entry.updated_at.strftime('%H:%M') }}</small></td>
+                                                                <!-- Data cells will be populated by JavaScript -->
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     {% endfor %}
@@ -84,43 +122,44 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Process all entry data containers
-    var entryContainers = document.querySelectorAll('[data-entry-data]');
+    // Helper function to format keys and sanitize values
+    function formatKey(key) {
+        return key.replace(/_/g, ' ').replace(/\b\w/g, function(l) { 
+            return l.toUpperCase(); 
+        });
+    }
     
-    entryContainers.forEach(function(container) {
+    function sanitizeValue(value) {
+        return String(value || 'N/A').replace(/[<>&"']/g, function(m) {
+            return {
+                '<': '&lt;',
+                '>': '&gt;',
+                '&': '&amp;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[m];
+        });
+    }
+    
+    // Process single entry containers (grid format)
+    var singleEntryContainers = document.querySelectorAll('[id^="entry-"]');
+    singleEntryContainers.forEach(function(container) {
         try {
             var entryDataStr = container.getAttribute('data-entry-data');
-            var parsedData;
+            if (!entryDataStr) return;
             
-            // Parse JSON data
-            if (entryDataStr) {
-                parsedData = JSON.parse(entryDataStr);
-            } else {
-                parsedData = {};
-            }
-            
+            var parsedData = JSON.parse(entryDataStr);
             var html = '';
             
-            // Generate HTML for each data field
+            // Generate HTML for each data field in grid format
             for (var key in parsedData) {
-                if (parsedData.hasOwnProperty(key)) {
-                    var value = parsedData[key] || 'N/A';
-                    var displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, function(l) { 
-                        return l.toUpperCase(); 
-                    });
-                    var safeValue = String(value).replace(/[<>&"']/g, function(m) {
-                        return {
-                            '<': '&lt;',
-                            '>': '&gt;',
-                            '&': '&amp;',
-                            '"': '&quot;',
-                            "'": '&#39;'
-                        }[m];
-                    });
+                if (parsedData.hasOwnProperty(key) && parsedData[key] !== null && parsedData[key] !== '') {
+                    var displayKey = formatKey(key);
+                    var safeValue = sanitizeValue(parsedData[key]);
                     
                     html += '<div class="col-md-6 mb-2">' +
                            '<strong>' + displayKey + ':</strong> ' +
-                           '<span>' + safeValue + '</span>' +
+                           '<span class="ms-2">' + safeValue + '</span>' +
                            '</div>';
                 }
             }
@@ -130,6 +169,55 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) {
             console.error('Error parsing entry data:', e);
             container.innerHTML = '<div class="text-danger">Error displaying data</div>';
+        }
+    });
+    
+    // Process table format for multiple entries
+    var tables = document.querySelectorAll('[id^="form-table-"]');
+    tables.forEach(function(table) {
+        var rows = table.querySelectorAll('tbody tr[data-entry-data]');
+        if (rows.length === 0) return;
+        
+        try {
+            // Get field headers from first row
+            var firstRowData = rows[0].getAttribute('data-entry-data');
+            var firstParsed = JSON.parse(firstRowData);
+            var headers = Object.keys(firstParsed).filter(function(key) {
+                return firstParsed[key] !== null && firstParsed[key] !== '';
+            });
+            
+            // Add headers to table
+            var headerRow = table.querySelector('thead tr');
+            headers.forEach(function(key) {
+                var th = document.createElement('th');
+                th.textContent = formatKey(key);
+                th.style.minWidth = '120px';
+                headerRow.appendChild(th);
+            });
+            
+            // Populate each row with data
+            rows.forEach(function(row) {
+                var rowDataStr = row.getAttribute('data-entry-data');
+                if (!rowDataStr) return;
+                
+                var rowData = JSON.parse(rowDataStr);
+                
+                headers.forEach(function(key) {
+                    var td = document.createElement('td');
+                    var value = rowData[key];
+                    
+                    if (value !== null && value !== '') {
+                        td.innerHTML = '<span class="text-dark">' + sanitizeValue(value) + '</span>';
+                    } else {
+                        td.innerHTML = '<span class="text-muted">-</span>';
+                    }
+                    
+                    row.appendChild(td);
+                });
+            });
+            
+        } catch (e) {
+            console.error('Error processing table data:', e);
         }
     });
 });

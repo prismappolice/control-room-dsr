@@ -324,29 +324,95 @@ function searchDSR() {
                     </div>
                 `;
                 
+                // Group entries by form type for better display
+                const entriesByForm = {};
                 data.forEach(entry => {
+                    const formType = entry.form_type || 'unknown';
+                    if (!entriesByForm[formType]) {
+                        entriesByForm[formType] = [];
+                    }
+                    entriesByForm[formType].push(entry);
+                });
+                
+                // Generate HTML for each form type
+                Object.entries(entriesByForm).forEach(([formType, formEntries]) => {
+                    const formName = formEntries[0].form_name || formType;
+                    const entryCount = formEntries.length;
+                    
                     html += `
-                        <div class="card mb-3">
+                        <div class="card mb-4">
                             <div class="card-header">
-                                <strong>${entry.form_name}</strong>
+                                <h6 class="mb-0">
+                                    <i class="fas fa-file-alt me-2"></i>
+                                    ${formName}
+                                    <span class="badge bg-primary ms-2">${entryCount} entr${entryCount === 1 ? 'y' : 'ies'}</span>
+                                </h6>
                             </div>
                             <div class="card-body">
-                                <div class="row">
                     `;
                     
-                    Object.entries(entry.data).forEach(([key, value]) => {
-                        html += `
-                            <div class="col-md-6 mb-2">
-                                <strong>${key.replace(/_/g, ' ').toUpperCase()}:</strong> ${value || 'N/A'}
-                            </div>
-                        `;
-                    });
+                    if (formEntries.length === 1) {
+                        // Single entry: show in grid format
+                        const entry = formEntries[0];
+                        html += '<div class="row">';
+                        Object.entries(entry.data).forEach(([key, value]) => {
+                            if (value !== null && value !== '') {
+                                const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                html += `
+                                    <div class="col-md-6 mb-2">
+                                        <strong>${displayKey}:</strong>
+                                        <span class="ms-2">${value || 'N/A'}</span>
+                                    </div>
+                                `;
+                            }
+                        });
+                        html += '</div>';
+                        
+                        if (entry.updated_at) {
+                            html += `<div class="mt-3"><small class="text-muted">Last updated: ${entry.updated_at}</small></div>`;
+                        }
+                    } else {
+                        // Multiple entries: show in table format
+                        html += '<div class="table-responsive">';
+                        html += `<table class="table table-hover form-table">`;
+                        html += `<thead class="table-light"><tr><th width="50">S.No</th><th width="80">Time</th>`;
+                        
+                        // Get headers from first entry
+                        const firstEntry = formEntries[0];
+                        const headers = Object.keys(firstEntry.data).filter(key => 
+                            firstEntry.data[key] !== null && firstEntry.data[key] !== ''
+                        );
+                        
+                        headers.forEach(key => {
+                            const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            html += `<th>${displayKey}</th>`;
+                        });
+                        
+                        html += '</tr></thead><tbody>';
+                        
+                        // Add data rows
+                        formEntries.forEach((entry, index) => {
+                            const time = entry.updated_at ? entry.updated_at.split(' ')[1] || 'N/A' : 'N/A';
+                            html += `<tr>`;
+                            html += `<td><span class="badge bg-secondary">${index + 1}</span></td>`;
+                            html += `<td><small class="text-muted">${time}</small></td>`;
+                            
+                            headers.forEach(key => {
+                                const value = entry.data[key];
+                                if (value !== null && value !== '') {
+                                    html += `<td><span class="text-dark">${value}</span></td>`;
+                                } else {
+                                    html += `<td><span class="text-muted">-</span></td>`;
+                                }
+                            });
+                            
+                            html += '</tr>';
+                        });
+                        
+                        html += '</tbody></table></div>';
+                    }
                     
-                    html += `
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    html += '</div></div>';
                 });
                 
                 resultsContainer.innerHTML = html;

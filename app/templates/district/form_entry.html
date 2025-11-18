@@ -66,11 +66,7 @@
                         <div class="mb-3">
                             <label for="entry_date" class="form-label">Entry Date *</label>
                             <input type="date" class="form-control" id="entry_date" name="entry_date" 
-                                   value="{{ today }}" min="{{ yesterday }}" max="{{ today }}" required>
-                            <div class="form-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Only today and yesterday entries are allowed
-                            </div>
+                                   value="{{ today }}" required>
                         </div>
                         
                         <div class="mb-3">
@@ -296,71 +292,6 @@ function showAlert(message, type) {
     setTimeout(() => {
         alertDiv.remove();
     }, 3000);
-}
-
-// ===== DATE VALIDATION FOR ALL FORMS =====
-// Add date validation for all forms - only today and yesterday allowed
-document.addEventListener('DOMContentLoaded', function() {
-    const dateField = document.getElementById('entry_date');
-    const form = document.getElementById('entryForm');
-    
-    if (dateField && form) {
-        // Add visual feedback on date change
-        dateField.addEventListener('change', function() {
-            const selectedDate = new Date(this.value);
-            const today = new Date('{{ today }}');
-            const yesterday = new Date('{{ yesterday }}');
-            
-            // Reset styling
-            this.classList.remove('is-invalid', 'is-valid');
-            
-            if (selectedDate > today) {
-                this.classList.add('is-invalid');
-                showDateError('Future dates are not allowed for DSR entries');
-            } else if (selectedDate < yesterday) {
-                this.classList.add('is-invalid');
-                showDateError('Only today and yesterday entries are allowed');
-            } else {
-                this.classList.add('is-valid');
-                hideDateError();
-            }
-        });
-        
-        // Add form submission validation
-        form.addEventListener('submit', function(e) {
-            const selectedDate = new Date(dateField.value);
-            const today = new Date('{{ today }}');
-            const yesterday = new Date('{{ yesterday }}');
-            
-            if (selectedDate > today || selectedDate < yesterday) {
-                e.preventDefault();
-                dateField.classList.add('is-invalid');
-                showDateError('Please select today or yesterday only');
-                dateField.focus();
-                return false;
-            }
-        });
-    }
-});
-
-function showDateError(message) {
-    // Remove existing error
-    hideDateError();
-    
-    const dateField = document.getElementById('entry_date');
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'invalid-feedback d-block';
-    errorDiv.id = 'date-error';
-    errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i>${message}`;
-    
-    dateField.parentNode.appendChild(errorDiv);
-}
-
-function hideDateError() {
-    const existingError = document.getElementById('date-error');
-    if (existingError) {
-        existingError.remove();
-    }
 }
 
 // ===== DYNAMIC DATE FUNCTIONALITY FOR CCTV FORM ONLY =====

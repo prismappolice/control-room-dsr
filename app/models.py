@@ -59,18 +59,8 @@ class ControlRoomUpload(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     original_filename = db.Column(db.String(255), nullable=False)
     file_path = db.Column(db.String(500), nullable=False)
-    uploaded_at = db.Column(db.DateTime, default=ist_now)
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
-    def get_ist_uploaded_at(self):
-        """Convert uploaded_at to IST timezone for display"""
-        if self.uploaded_at.tzinfo is None:
-            # Assume naive datetime is UTC and convert to IST
-            utc_dt = pytz.UTC.localize(self.uploaded_at)
-            return utc_dt.astimezone(IST)
-        else:
-            # Already timezone-aware, just convert to IST
-            return self.uploaded_at.astimezone(IST)
 
 # Form configurations
 FORM_CONFIGS = {

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user"></i> User Profile
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Username:</strong></label>
+                                <p class="form-control-static">{{ user.username }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>User Type:</strong></label>
+                                <p class="form-control-static">
+                                    {% if user.user_type == 'admin' %}
+                                        <span class="badge bg-danger">Administrator</span>
+                                    {% elif user.user_type == 'district' %}
+                                        <span class="badge bg-primary">District User</span>
+                                    {% elif user.user_type == 'controlroom' %}
+                                        <span class="badge bg-success">Control Room User</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if user.district_name %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>District:</strong></label>
+                                <p class="form-control-static">{{ user.district_name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Account Created:</strong></label>
+                                <p class="form-control-static">{{ user.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Last Password Change:</strong></label>
+                                <p class="form-control-static">
+                                    {% if user.last_password_change %}
+                                        {{ user.last_password_change.strftime('%B %d, %Y at %I:%M %p') }}
+                                    {% else %}
+                                        Never changed
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Account Status:</strong></label>
+                                <p class="form-control-static">
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{{ url_for('auth.change_password') }}" class="btn btn-warning">
+                                <i class="fas fa-key"></i> Change Password
+                            </a>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            {% if current_user.user_type == 'admin' %}
+                                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                                </a>
+                            {% elif current_user.user_type == 'district' %}
+                                <a href="{{ url_for('district.dashboard') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                                </a>
+                            {% elif current_user.user_type == 'controlroom' %}
+                                <a href="{{ url_for('district.controlroom_dashboard') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

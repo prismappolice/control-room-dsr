@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}{{ form_config.name }} - Control Room DSR{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4><i class="fas fa-file-alt me-2"></i>{{ form_config.name }}</h4>
+                        <a href="{{ url_for('district.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Existing Entries Display -->
+                    {% if existing_entries %}
+                    <div class="mb-4">
+                        <h5 class="text-primary"><i class="fas fa-list me-2"></i>Existing Entries for Today</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Entry #</th>
+                                        <th>Time</th>
+                                        {% for field in form_config.fields[:3] %}
+                                        <th>{{ field.label }}</th>
+                                        {% endfor %}
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entry in existing_entries %}
+                                    <tr>
+                                        <td><span class="badge bg-primary">{{ loop.index }}</span></td>
+                                        <td>{{ entry.created_at.strftime('%H:%M') }}</td>
+                                        {% for field in form_config.fields[:3] %}
+                                        <td>{{ entry.data_dict.get(field.name, '-') }}</td>
+                                        {% endfor %}
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1 edit-entry-btn" data-entry-id="{{ entry.id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger delete-entry-btn" data-entry-id="{{ entry.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    {% endif %}
+
+                    <h5 class="text-success mb-3">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Entry
+                    </h5>
+
+                    <form method="POST" id="entryForm">
+                        <div class="mb-3">
+                            <label for="entry_date" class="form-label">Entry Date *</label>
+                            <input type="date" class="form-control" id="entry_date" name="entry_date" 
+                                   value="{{ today }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <input type="hidden" id="entry_id" name="entry_id" value="">
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="row">
+                            {% for field in form_config.fields %}
+                            <div class="{% if field.type == 'textarea' %}col-12{% else %}col-md-6{% endif %} mb-3">
+                                <label for="{{ field.name }}" class="form-label">
+                                    {{ field.label }}
+                                    {% if field.get('required') %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                
+                                {% if field.type == 'textarea' %}
+                                <textarea class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                          rows="3" placeholder="Enter {{ field.label.lower() }}"></textarea>
+                                {% elif field.type == 'number' %}
+                                <input type="number" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                       placeholder="Enter {{ field.label.lower() }}" min="0">
+                                {% elif field.type == 'date' %}
+                                <input type="date" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                       placeholder="Enter {{ field.label.lower() }}">
+                                {% else %}
+                                <input type="text" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                       placeholder="Enter {{ field.label.lower() }}">
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('district.dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            <div>
+                                <button type="button" class="btn btn-success me-2" id="addAnotherBtn">
+                                    <i class="fas fa-plus me-1"></i>Save & Add Another
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Save Entry
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Delete entry functionality
+    document.querySelectorAll('.delete-entry-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const entryId = this.getAttribute('data-entry-id');
+            
+            if (confirm('Are you sure you want to delete this entry?')) {
+                fetch(`/district/form/{{ form_type }}/delete/${entryId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Entry deleted successfully', 'success');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showAlert(data.message || 'Error deleting entry', 'error');
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error deleting entry', 'error');
+                    console.error('Error:', error);
+                });
+            }
+        });
+    });
+
+    // Edit entry functionality
+    document.querySelectorAll('.edit-entry-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const entryId = this.getAttribute('data-entry-id');
+            editEntry(entryId);
+        });
+    });
+
+    // Add another functionality
+    document.getElementById('addAnotherBtn').addEventListener('click', function() {
+        const form = document.getElementById('entryForm');
+        const formData = new FormData(form);
+        
+        // Submit form via AJAX and clear form for next entry
+        fetch(form.action || window.location.pathname, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Clear form for next entry
+                form.reset();
+                document.getElementById('entry_date').value = '{{ today }}';
+                document.getElementById('entry_id').value = '';
+                
+                // Show success message
+                showAlert('Entry saved successfully! Add another entry.', 'success');
+                
+                // Reload page to show updated entries list
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlert(data.message || 'Error saving entry', 'error');
+            }
+        })
+        .catch(error => {
+            showAlert('Error saving entry', 'error');
+            console.error('Error:', error);
+        });
+    });
+
+    // Form validation and AJAX submission
+    document.getElementById('entryForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
+        const entryDate = document.getElementById('entry_date').value;
+        if (!entryDate) {
+            alert('Please select an entry date');
+            return false;
+        }
+        
+        // Show loading state
+        const submitBtn = document.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+        submitBtn.disabled = true;
+        
+        // Submit form via AJAX
+        const formData = new FormData(this);
+        
+        fetch(this.action || window.location.pathname, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Reset button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            if (data.success) {
+                // Show success message
+                showAlert('Entry saved successfully!', 'success');
+                
+                // Reload page to show updated entries list
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlert(data.message || 'Error saving entry', 'error');
+            }
+        })
+        .catch(error => {
+            // Reset button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            showAlert('Error saving entry', 'error');
+            console.error('Error:', error);
+        });
+    });
+});
+
+// Helper functions
+function editEntry(entryId) {
+    // Load entry data for editing
+    fetch(`/district/form/{{ form_type }}/edit/${entryId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Populate form with entry data
+                document.getElementById('entry_id').value = entryId;
+                const entryData = data.entry_data;
+                
+                // Fill form fields dynamically
+                Object.keys(entryData).forEach(fieldName => {
+                    const field = document.getElementById(fieldName);
+                    if (field) {
+                        field.value = entryData[fieldName] || '';
+                    }
+                });
+                
+                // Scroll to form
+                document.getElementById('entryForm').scrollIntoView({ behavior: 'smooth' });
+                showAlert('Entry loaded for editing', 'info');
+            }
+        })
+        .catch(error => {
+            showAlert('Error loading entry for edit', 'error');
+            console.error('Error:', error);
+        });
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+
+// ===== DYNAMIC DATE FUNCTIONALITY FOR CCTV FORM ONLY =====
+// This only affects cctv_installation_abstract form, all other forms unchanged
+function initializeDynamicDates() {
+    // Only execute for CCTV Installation Abstract form
+    console.log('Form type:', '{{ form_type }}');
+    if ('{{ form_type }}' !== 'cctv_installation_abstract') {
+        console.log('Not CCTV form, exiting...');
+        return; // Exit immediately for all other forms - NO CHANGES TO OTHER FORMS
+    }
+    console.log('CCTV form detected, initializing dynamic dates...');
+    
+    // Add event listener to entry date field
+    const dateField = document.getElementById('entry_date');
+    if (!dateField) {
+        console.log('Date field not found!');
+        return;
+    }
+    console.log('Date field found:', dateField.value);
+    
+    // Set today's date as default
+    const today = new Date();
+    if (!dateField.value) {
+        dateField.value = today.toISOString().split('T')[0];
+    }
+    
+    // Update labels when date changes
+    dateField.addEventListener('change', function() {
+        updateCCTVLabels(this.value);
+    });
+    
+    // Initialize with current date
+    updateCCTVLabels(dateField.value || today.toISOString().split('T')[0]);
+}
+
+function updateCCTVLabels(selectedDate) {
+    if (!selectedDate) return;
+    
+    console.log('Updating CCTV labels for date:', selectedDate);
+    const entryDate = new Date(selectedDate);
+    
+    // Calculate required dates based on your requirements
+    const twoDaysBefore = new Date(entryDate);
+    twoDaysBefore.setDate(entryDate.getDate() - 2);
+    
+    const oneDayBefore = new Date(entryDate);
+    oneDayBefore.setDate(entryDate.getDate() - 1);
+    
+    // Format dates as DD.MM.YYYY
+    const formatDate = (date) => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    };
+    
+    const twoDaysBeforeStr = formatDate(twoDaysBefore);
+    const oneDayBeforeStr = formatDate(oneDayBefore);
+    
+    // Update only CCTV form labels - field mappings based on your requirements
+    const labelMappings = {
+        'cumulative_upto_01_11_2025': `Cumulative upto/Cameras installed by ${twoDaysBeforeStr}`,
+        'cameras_mapped_gis_02_11_2025': `How many Cameras mapped on GIS as on ${oneDayBeforeStr}`,
+        'cameras_installed_02_11_2025': `Cameras installed on ${oneDayBeforeStr}`,
+        'cumulative_upto_02_11_2025': `Cumulative upto ${oneDayBeforeStr}`,
+        'cities_villages_connected': `Number of cities/villages connected with CCTVs as on ${oneDayBeforeStr}`
+    };
+    
+    // Update labels safely
+    Object.keys(labelMappings).forEach(fieldName => {
+        const label = document.querySelector(`label[for="${fieldName}"]`);
+        if (label) {
+            console.log(`Updating label for ${fieldName}:`, labelMappings[fieldName]);
+            // Preserve required asterisk if present
+            const hasRequired = label.innerHTML.includes('<span class="text-danger">*</span>');
+            label.innerHTML = labelMappings[fieldName] + (hasRequired ? '<span class="text-danger">*</span>' : '');
+        } else {
+            console.log(`Label not found for field: ${fieldName}`);
+        }
+    });
+}
+
+// Initialize when page loads (only for CCTV form)
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure form is fully loaded
+    setTimeout(initializeDynamicDates, 100);
+});
+</script>
+{% endblock %}

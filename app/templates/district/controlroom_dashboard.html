@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Control Room Dashboard - Control Room DSR{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-building me-2"></i>Control Room Dashboard</h2>
+                <div class="badge bg-warning fs-6">Control Room User</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-upload me-2"></i>File Uploads</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('district.upload_file') }}" enctype="multipart/form-data">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="upload_date" class="form-label">Date *</label>
+                                <input type="date" class="form-control" id="upload_date" name="upload_date" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="upload_type" class="form-label">Upload Type *</label>
+                                <select class="form-select" id="upload_type" name="upload_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="periscope">Periscope</option>
+                                    <option value="vip_engagements">VIP Engagements</option>
+                                    <option value="ps_rtm">334PS RTM&E-Sakshya 334(A)case Non CPS&CPS Employees</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="file" class="form-label">File *</label>
+                                <input type="file" class="form-control" id="file" name="file" required 
+                                       accept=".pdf,.xlsx,.xls,.docx,.doc">
+                                <div class="form-text">Supported formats: PDF, Excel, Word (Max: 16MB)</div>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-upload me-1"></i>Upload
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="file-preview" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload Categories -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="upload-icon mb-3">
+                        <i class="fas fa-search-location fa-3x text-primary"></i>
+                    </div>
+                    <h5>Periscope</h5>
+                    <p class="text-muted">Upload periscope related documents and reports</p>
+                    <div class="upload-area" data-type="periscope">
+                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                        <p class="mb-0">Drag & Drop files here</p>
+                        <small class="text-muted">or click to browse</small>
+                        <input type="file" class="d-none" accept=".pdf,.xlsx,.xls,.docx,.doc">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="upload-icon mb-3">
+                        <i class="fas fa-user-tie fa-3x text-success"></i>
+                    </div>
+                    <h5>VIP Engagements</h5>
+                    <p class="text-muted">Upload VIP engagement schedules and reports</p>
+                    <div class="upload-area" data-type="vip_engagements">
+                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                        <p class="mb-0">Drag & Drop files here</p>
+                        <small class="text-muted">or click to browse</small>
+                        <input type="file" class="d-none" accept=".pdf,.xlsx,.xls,.docx,.doc">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="upload-icon mb-3">
+                        <i class="fas fa-shield-alt fa-3x text-warning"></i>
+                    </div>
+                    <h5>334PS RTM&E-Sakshya</h5>
+                    <p class="text-muted">Upload police station records and employee data</p>
+                    <div class="upload-area" data-type="ps_rtm">
+                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                        <p class="mb-0">Drag & Drop files here</p>
+                        <small class="text-muted">or click to browse</small>
+                        <input type="file" class="d-none" accept=".pdf,.xlsx,.xls,.docx,.doc">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Uploads -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock me-2"></i>Recent Uploads</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_uploads %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Filename</th>
+                                    <th>Upload Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for upload in recent_uploads %}
+                                <tr>
+                                    <td>{{ upload.date.strftime('%d-%m-%Y') }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            {% if upload.upload_type == 'periscope' %}
+                                                Periscope
+                                            {% elif upload.upload_type == 'vip_engagements' %}
+                                                VIP Engagements
+                                            {% elif upload.upload_type == 'ps_rtm' %}
+                                                334PS RTM&E
+                                            {% else %}
+                                                {{ upload.upload_type }}
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-file me-2"></i>
+                                        {{ upload.original_filename }}
+                                    </td>
+                                    <td>{{ upload.uploaded_at.strftime('%d-%m-%Y %H:%M') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('district.download_upload', upload_id=upload.id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download"></i> Download
+                                        </a>
+                                        <a href="{{ url_for('district.view_upload', upload_id=upload.id) }}" 
+                                           class="btn btn-sm btn-outline-info" target="_blank">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-upload fa-3x text-muted mb-3"></i>
+                        <h6>No uploads yet</h6>
+                        <p class="text-muted">Start by uploading your first document</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set today's date as default
+document.getElementById('upload_date').valueAsDate = new Date();
+
+// Upload area click handlers
+document.querySelectorAll('.upload-area').forEach(area => {
+    area.addEventListener('click', function() {
+        const fileInput = this.querySelector('input[type="file"]');
+        fileInput.click();
+    });
+});
+
+// File download and view handled by Flask routes
+</script>
+{% endblock %}

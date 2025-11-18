@@ -1,0 +1,538 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Control Room DSR{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+                <div class="search-container">
+                    <div class="input-group">
+                        <input type="date" class="form-control" id="searchDate" placeholder="Select Date">
+                        <select class="form-select" id="searchDistrict">
+                            <option value="">Select District</option>
+                            {% for district in districts %}
+                            <option value="{{ district }}">{{ district }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-primary" type="button" onclick="searchDSR()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card bg-primary text-white">
+                <div class="stat-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ stats.total_districts }}</h3>
+                    <p>Total Districts</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stat-card bg-success text-white">
+                <div class="stat-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ stats.total_forms }}</h3>
+                    <p>Report Forms</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stat-card bg-warning text-white">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ stats.today_entries }}</h3>
+                    <p>Today's Entries</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stat-card bg-info text-white">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Active</h3>
+                    <p>System Status</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Districts Overview -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-map me-2"></i>Districts Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for district in districts %}
+                        <div class="col-md-4 col-lg-3 mb-3">
+                            <a href="{{ url_for('admin.district_view', district_name=district) }}" class="district-card">
+                                <div class="district-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="district-name">{{ district }}</div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Forms Overview -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list me-2"></i>Report Forms</h5>
+                        <small class="text-muted">Select date to filter forms</small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Date Filter for Forms -->
+                    <div class="mb-3">
+                        <div class="input-group input-group-sm">
+                            <input type="date" class="form-control" id="formFilterDate" placeholder="Select Date for Forms">
+                            <button class="btn btn-outline-secondary" type="button" onclick="clearFormDate()" title="Clear Date Filter">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Click form to see all districts data for selected date</small>
+                    </div>
+                    
+                    <div class="forms-list">
+                        {% for form_key, form_config in forms.items() %}
+                        <a href="javascript:void(0)" onclick="viewFormData('{{ form_key }}')" class="form-item" data-form-key="{{ form_key }}">
+                            <div class="form-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="form-name">{{ form_config.name }}</div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Control Room Uploads -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-upload me-2"></i>Control Room Uploads</h5>
+                        <div class="d-flex gap-2">
+                            <input type="date" class="form-control form-control-sm" id="uploadSearchDate" placeholder="Filter by date">
+                            <button class="btn btn-sm btn-primary" onclick="filterUploads()">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <a href="{{ url_for('admin.uploads_view') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> View All
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Upload Type</th>
+                                    <th>Upload Date</th>
+                                    <th>Uploaded At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="uploadsTable">
+                                {% for upload in recent_uploads %}
+                                <tr>
+                                    <td>{{ upload.original_filename }}</td>
+                                    <td><span class="badge bg-info">{{ upload.upload_type }}</span></td>
+                                    <td>{{ upload.date.strftime('%d-%m-%Y') }}</td>
+                                    <td>{{ upload.uploaded_at.strftime('%d-%m-%Y %H:%M') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.download_upload', upload_id=upload.id) }}" 
+                                           class="btn btn-sm btn-outline-success me-1">
+                                            <i class="fas fa-download"></i> Download
+                                        </a>
+                                        <a href="{{ url_for('admin.view_upload', upload_id=upload.id) }}" 
+                                           class="btn btn-sm btn-outline-primary me-1" target="_blank">
+                                            <i class="fas fa-external-link-alt"></i> Open
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-info view-upload-btn" data-upload-id="{{ upload.id }}">
+                                            <i class="fas fa-eye"></i> Details
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent DSR Activity -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock me-2"></i>Recent DSR Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>District</th>
+                                    <th>Form Type</th>
+                                    <th>Date</th>
+                                    <th>Last Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in recent_entries %}
+                                <tr>
+                                    <td>{{ entry.district_name }}</td>
+                                    <td>{{ forms.get(entry.form_type, {}).get('name', entry.form_type) }}</td>
+                                    <td>{{ entry.date.strftime('%d-%m-%Y') }}</td>
+                                    <td>{{ entry.updated_at.strftime('%d-%m-%Y %H:%M') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.download_dsr', district_name=entry.district_name, date_str=entry.date.strftime('%Y-%m-%d')) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Results Modal -->
+<div class="modal fade" id="searchModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">DSR Search Results</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="searchResults">
+                <!-- Search results will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // View upload details functionality
+    document.querySelectorAll('.view-upload-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const uploadId = this.getAttribute('data-upload-id');
+            viewUploadDetails(uploadId);
+        });
+    });
+});
+
+// Form filtering with date functionality
+function viewFormData(formKey) {
+    const formDate = document.getElementById('formFilterDate').value;
+    
+    if (!formDate) {
+        alert('Please select a date first to filter form data');
+        return;
+    }
+    
+    // Navigate to form view with date parameter
+    window.location.href = `/admin/form/${formKey}?date=${formDate}`;
+}
+
+function clearFormDate() {
+    document.getElementById('formFilterDate').value = '';
+    // Optionally update visual indicators
+    document.querySelectorAll('.form-item').forEach(item => {
+        item.style.opacity = '1';
+    });
+}
+
+// Set today's date as default for form filter
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const todayString = today.getFullYear() + '-' + 
+                       String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(today.getDate()).padStart(2, '0');
+    document.getElementById('formFilterDate').value = todayString;
+});
+
+function searchDSR() {
+    const date = document.getElementById('searchDate').value;
+    const district = document.getElementById('searchDistrict').value;
+    
+    if (!date || !district) {
+        alert('Please select both date and district');
+        return;
+    }
+    
+    fetch(`/admin/search?date=${date}&district=${encodeURIComponent(district)}`)
+        .then(response => response.json())
+        .then(data => {
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (data.error) {
+                resultsContainer.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            } else if (data.length === 0) {
+                resultsContainer.innerHTML = '<div class="alert alert-info">No DSR data found for the selected date and district.</div>';
+            } else {
+                let html = `
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6>DSR for ${district} on ${date}</h6>
+                        <a href="/admin/download_dsr/${encodeURIComponent(district)}/${date}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download me-1"></i>Download Excel
+                        </a>
+                    </div>
+                `;
+                
+                // Group entries by form type for better display
+                const entriesByForm = {};
+                data.forEach(entry => {
+                    const formType = entry.form_type || 'unknown';
+                    if (!entriesByForm[formType]) {
+                        entriesByForm[formType] = [];
+                    }
+                    entriesByForm[formType].push(entry);
+                });
+                
+                // Generate HTML for each form type
+                Object.entries(entriesByForm).forEach(([formType, formEntries]) => {
+                    const formName = formEntries[0].form_name || formType;
+                    const entryCount = formEntries.length;
+                    
+                    html += `
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-file-alt me-2"></i>
+                                    ${formName}
+                                    <span class="badge bg-primary ms-2">${entryCount} entr${entryCount === 1 ? 'y' : 'ies'}</span>
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                    `;
+                    
+                    if (formEntries.length === 1) {
+                        // Single entry: show in grid format
+                        const entry = formEntries[0];
+                        html += '<div class="row">';
+                        Object.entries(entry.data).forEach(([key, value]) => {
+                            if (value !== null && value !== '') {
+                                const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                html += `
+                                    <div class="col-md-6 mb-2">
+                                        <strong>${displayKey}:</strong>
+                                        <span class="ms-2">${value || 'N/A'}</span>
+                                    </div>
+                                `;
+                            }
+                        });
+                        html += '</div>';
+                        
+                        if (entry.updated_at) {
+                            html += `<div class="mt-3"><small class="text-muted">Last updated: ${entry.updated_at}</small></div>`;
+                        }
+                    } else {
+                        // Multiple entries: show in table format
+                        html += '<div class="table-responsive">';
+                        html += `<table class="table table-hover form-table">`;
+                        html += `<thead class="table-light"><tr><th width="50">S.No</th><th width="80">Time</th>`;
+                        
+                        // Get headers from first entry
+                        const firstEntry = formEntries[0];
+                        const headers = Object.keys(firstEntry.data).filter(key => 
+                            firstEntry.data[key] !== null && firstEntry.data[key] !== ''
+                        );
+                        
+                        headers.forEach(key => {
+                            const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            html += `<th>${displayKey}</th>`;
+                        });
+                        
+                        html += '</tr></thead><tbody>';
+                        
+                        // Add data rows
+                        formEntries.forEach((entry, index) => {
+                            const time = entry.updated_at ? entry.updated_at.split(' ')[1] || 'N/A' : 'N/A';
+                            html += `<tr>`;
+                            html += `<td><span class="badge bg-secondary">${index + 1}</span></td>`;
+                            html += `<td><small class="text-muted">${time}</small></td>`;
+                            
+                            headers.forEach(key => {
+                                const value = entry.data[key];
+                                if (value !== null && value !== '') {
+                                    html += `<td><span class="text-dark">${value}</span></td>`;
+                                } else {
+                                    html += `<td><span class="text-muted">-</span></td>`;
+                                }
+                            });
+                            
+                            html += '</tr>';
+                        });
+                        
+                        html += '</tbody></table></div>';
+                    }
+                    
+                    html += '</div></div>';
+                });
+                
+                resultsContainer.innerHTML = html;
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('searchModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while searching');
+        });
+}
+
+function filterUploads() {
+    const date = document.getElementById('uploadSearchDate').value;
+    
+    if (!date) {
+        alert('Please select a date to filter uploads');
+        return;
+    }
+    
+    fetch(`/admin/uploads/filter?date=${date}`)
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('uploadsTable');
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No uploads found for the selected date</td></tr>';
+            } else {
+                let html = '';
+                data.forEach(upload => {
+                    html += `
+                        <tr>
+                            <td>${upload.original_filename}</td>
+                            <td><span class="badge bg-info">${upload.upload_type}</span></td>
+                            <td>${upload.date}</td>
+                            <td>${upload.uploaded_at}</td>
+                            <td>
+                                <a href="/admin/download_upload/${upload.id}" class="btn btn-sm btn-outline-success me-1">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                                <button class="btn btn-sm btn-outline-info view-upload-btn" data-upload-id="${upload.id}">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tableBody.innerHTML = html;
+                
+                // Re-attach event listeners
+                document.querySelectorAll('.view-upload-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const uploadId = this.getAttribute('data-upload-id');
+                        viewUploadDetails(uploadId);
+                    });
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while filtering uploads');
+        });
+}
+
+function viewUploadDetails(uploadId) {
+    fetch(`/admin/upload/details/${uploadId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                const modalHtml = `
+                    <div class="modal fade" id="uploadDetailsModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Upload Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table">
+                                        <tr><th>File Name:</th><td>${data.original_filename}</td></tr>
+                                        <tr><th>Upload Type:</th><td>${data.upload_type}</td></tr>
+                                        <tr><th>Upload Date:</th><td>${data.date}</td></tr>
+                                        <tr><th>Uploaded At:</th><td>${data.uploaded_at}</td></tr>
+                                        <tr><th>File Size:</th><td>${data.file_size || 'N/A'}</td></tr>
+                                        <tr><th>Uploaded By:</th><td>${data.uploaded_by}</td></tr>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="/admin/download_upload/${uploadId}" class="btn btn-success">
+                                        <i class="fas fa-download me-1"></i>Download File
+                                    </a>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if present
+                const existingModal = document.getElementById('uploadDetailsModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add new modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('uploadDetailsModal'));
+                modal.show();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while fetching upload details');
+        });
+}
+</script>
+{% endblock %}

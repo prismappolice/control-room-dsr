@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}File Upload - Control Room DSR{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4><i class="fas fa-upload me-2"></i>File Upload</h4>
+                        <a href="{{ url_for('district.controlroom_dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="upload_date" class="form-label">Upload Date *</label>
+                                <input type="date" class="form-control" id="upload_date" name="upload_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="upload_type" class="form-label">Upload Type *</label>
+                                <select class="form-select" id="upload_type" name="upload_type" required>
+                                    <option value="">Select Upload Type</option>
+                                    <option value="periscope">Periscope</option>
+                                    <option value="vip_engagements">VIP Engagements</option>
+                                    <option value="ps_rtm">334PS RTM&E-Sakshya 334(A)case Non CPS&CPS Employees</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="file" class="form-label">Select File *</label>
+                            <div class="upload-area">
+                                <input type="file" class="form-control" id="file" name="file" required
+                                       accept=".pdf,.xlsx,.xls,.docx,.doc">
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <h6>Choose a file or drag it here</h6>
+                                    <p class="text-muted">Supported formats: PDF, Excel, Word documents</p>
+                                    <p class="text-muted">Maximum file size: 16MB</p>
+                                </div>
+                                <div class="file-preview" style="display: none;"></div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('district.controlroom_dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-1"></i>Upload File
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set today's date as default
+document.getElementById('upload_date').valueAsDate = new Date();
+
+// File upload handling
+const fileInput = document.getElementById('file');
+const uploadArea = document.querySelector('.upload-area');
+const uploadPlaceholder = document.querySelector('.upload-placeholder');
+const filePreview = document.querySelector('.file-preview');
+
+fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        uploadPlaceholder.style.display = 'none';
+        filePreview.style.display = 'block';
+        filePreview.innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-file fa-2x text-primary mb-2"></i>
+                <h6>${file.name}</h6>
+                <p class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFile()">
+                    <i class="fas fa-times me-1"></i>Remove
+                </button>
+            </div>
+        `;
+    }
+});
+
+function clearFile() {
+    fileInput.value = '';
+    uploadPlaceholder.style.display = 'block';
+    filePreview.style.display = 'none';
+}
+
+// Drag and drop
+uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        fileInput.files = files;
+        fileInput.dispatchEvent(new Event('change'));
+    }
+});
+
+// Form submission
+document.querySelector('form').addEventListener('submit', function(e) {
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Uploading...';
+    submitBtn.disabled = true;
+    
+    // Re-enable after delay in case of error
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 10000);
+});
+</script>
+{% endblock %}

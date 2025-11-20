@@ -25,6 +25,16 @@ def load_user(user_id):
 # Main routes
 @main_bp.route('/')
 def index():
+    # If user is already authenticated, redirect to appropriate dashboard
+    if current_user.is_authenticated:
+        if current_user.user_type == 'admin':
+            return redirect(url_for('admin.dashboard'))
+        elif current_user.user_type == 'district':
+            return redirect(url_for('district.dashboard'))
+        elif current_user.user_type == 'controlroom':
+            return redirect(url_for('district.controlroom_dashboard'))
+    
+    # If not authenticated, show the login page
     return render_template('index.html')
 
 # Authentication routes
@@ -39,6 +49,11 @@ def login():
         
         if user and user.check_password(password):
             login_user(user)
+            # Set session timeout tracking
+            session.permanent = True
+            session['login_time'] = datetime.now().isoformat()
+            session['last_activity'] = datetime.now().isoformat()
+            
             if user.user_type == 'admin':
                 return redirect(url_for('admin.dashboard'))
             elif user.user_type == 'district':
@@ -54,6 +69,8 @@ def login():
 @login_required
 def logout():
     logout_user()
+    session.clear()  # Clear all session data
+    flash('You have been logged out successfully', 'success')
     return redirect(url_for('main.index'))
 
 # Admin routes
@@ -820,3 +837,12 @@ def change_password():
             return redirect(url_for('district.controlroom_dashboard'))
     
     return render_template('change_password.html')
+
+@auth_bp.route('/extend-session', methods=['POST'])
+@login_required
+def extend_session():
+    """Extend user session when they choose to stay logged in"""
+    session.permanent = True
+    session['login_time'] = datetime.now().isoformat()
+    session['last_activity'] = datetime.now().isoformat()
+    return jsonify({'success': True, 'message': 'Session extended'})

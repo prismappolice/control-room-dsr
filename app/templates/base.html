@@ -40,6 +40,9 @@
                         <div class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user me-1"></i>{{ current_user.username }}
+                                <span class="badge bg-success ms-1" id="sessionStatus" title="Session Active">
+                                    <i class="fas fa-circle" style="font-size: 8px;"></i>
+                                </span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">
@@ -48,6 +51,10 @@
                                 <li><a class="dropdown-item" href="{{ url_for('auth.change_password') }}">
                                     <i class="fas fa-key me-2"></i>Change Password
                                 </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="dropdown-item-text small text-muted">
+                                    <i class="fas fa-clock me-2"></i>Session: <span id="sessionTime">Active</span>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
                                     <i class="fas fa-sign-out-alt me-2"></i>Logout

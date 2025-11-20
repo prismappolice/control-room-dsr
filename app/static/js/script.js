@@ -273,6 +273,172 @@ function printReport(elementId) {
     printWindow.document.close();
 }
 
+// Session timeout warning functionality
+function initSessionTimeout() {
+    const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour in milliseconds
+    const WARNING_TIME = 10 * 60 * 1000; // Show warning 10 minutes before timeout
+    
+    let sessionTimer;
+    let warningTimer;
+    let warningShown = false;
+
+    function resetTimers() {
+        clearTimeout(sessionTimer);
+        clearTimeout(warningTimer);
+        warningShown = false;
+        
+        // Set warning timer (50 minutes)
+        warningTimer = setTimeout(showSessionWarning, SESSION_TIMEOUT - WARNING_TIME);
+        
+        // Set session timeout (60 minutes)
+        sessionTimer = setTimeout(handleSessionTimeout, SESSION_TIMEOUT);
+    }
+
+    function showSessionWarning() {
+        if (warningShown) return;
+        warningShown = true;
+        
+        const warningDiv = document.createElement('div');
+        warningDiv.id = 'sessionWarning';
+        warningDiv.className = 'modal fade';
+        warningDiv.setAttribute('data-bs-backdrop', 'static');
+        warningDiv.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Session Timeout Warning
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Your session will expire in <strong><span id="countdownTimer">10:00</span></strong> minutes due to inactivity.</p>
+                        <p>Click "Stay Logged In" to extend your session, or "Logout Now" to logout immediately.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" onclick="extendSession()">
+                            <i class="fas fa-clock me-2"></i>Stay Logged In
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="logoutNow()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(warningDiv);
+        
+        const modal = new bootstrap.Modal(warningDiv);
+        modal.show();
+        
+        // Start countdown
+        startCountdown();
+    }
+
+    function startCountdown() {
+        let timeLeft = 10 * 60; // 10 minutes in seconds
+        const countdownElement = document.getElementById('countdownTimer');
+        
+        const countdown = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdownElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            timeLeft--;
+            
+            if (timeLeft < 0) {
+                clearInterval(countdown);
+                handleSessionTimeout();
+            }
+        }, 1000);
+    }
+
+    function handleSessionTimeout() {
+        // Redirect to logout
+        window.location.href = '/auth/logout';
+    }
+
+    window.extendSession = function() {
+        // Make a request to extend session
+        fetch('/auth/extend-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => {
+            if (response.ok) {
+                // Reset timers
+                resetTimers();
+                
+                // Close warning modal
+                const warningModal = document.getElementById('sessionWarning');
+                if (warningModal) {
+                    const modal = bootstrap.Modal.getInstance(warningModal);
+                    modal.hide();
+                    warningModal.remove();
+                }
+                
+                showAlert('Session extended successfully!', 'success');
+            }
+        }).catch(error => {
+            console.error('Error extending session:', error);
+        });
+    };
+
+    window.logoutNow = function() {
+        window.location.href = '/auth/logout';
+    };
+
+    // Reset timers on user activity
+    ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+        document.addEventListener(event, resetTimers, true);
+    });
+
+    // Initialize timers
+    resetTimers();
+}
+
+// Update session time display
+function updateSessionTimeDisplay() {
+    const sessionTimeElement = document.getElementById('sessionTime');
+    const sessionStatusElement = document.getElementById('sessionStatus');
+    
+    if (!sessionTimeElement || !sessionStatusElement) return;
+    
+    // This will be updated by the session timeout timer
+    let sessionStartTime = new Date();
+    
+    setInterval(() => {
+        const now = new Date();
+        const elapsed = now - sessionStartTime;
+        const hours = Math.floor(elapsed / (1000 * 60 * 60));
+        const minutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+        
+        const timeLeft = 60 - minutes; // Assuming 1-hour session
+        
+        if (timeLeft > 10) {
+            sessionTimeElement.textContent = `${timeLeft}min left`;
+            sessionStatusElement.className = 'badge bg-success ms-1';
+            sessionStatusElement.title = 'Session Active';
+        } else if (timeLeft > 0) {
+            sessionTimeElement.textContent = `${timeLeft}min left`;
+            sessionStatusElement.className = 'badge bg-warning ms-1';
+            sessionStatusElement.title = 'Session expires soon';
+        } else {
+            sessionTimeElement.textContent = 'Expired';
+            sessionStatusElement.className = 'badge bg-danger ms-1';
+            sessionStatusElement.title = 'Session expired';
+        }
+    }, 60000); // Update every minute
+}
+
+// Initialize session timeout for authenticated users
+if (document.querySelector('.navbar-nav .dropdown')) {
+    initSessionTimeout();
+    updateSessionTimeDisplay();
+}
+
 // Export functions for global use
 window.showAlert = showAlert;
 window.submitFormWithLoading = submitFormWithLoading;

@@ -18,9 +18,9 @@ def create_app():
     if 'SQLALCHEMY_DATABASE_URI' not in app.config or not app.config['SQLALCHEMY_DATABASE_URI']:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///control_room_dsr.db'
     
-    # Session timeout configuration (1 hour = 3600 seconds)
-    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
-    app.config['SESSION_PERMANENT'] = True
+    # Session idle timeout configuration (10 minutes)
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
+    app.config['SESSION_PERMANENT'] = False  # Session cookie expires on browser close
     
     # Initialize extensions
     db.init_app(app)
@@ -43,22 +43,23 @@ def create_app():
             (request.endpoint.startswith('static') or 
              request.endpoint in ['auth.login', 'auth.logout', 'main.index'])):
             return
-        
+
         # Check if user is authenticated
         if current_user.is_authenticated:
-            # Make session permanent to use PERMANENT_SESSION_LIFETIME
-            session.permanent = True
-            
-            # Update last activity time
-            session['last_activity'] = datetime.now().isoformat()
-            
-            # Check if session has expired (additional check)
-            if 'login_time' in session:
-                login_time = datetime.fromisoformat(session['login_time'])
-                if datetime.now() - login_time > app.config['PERMANENT_SESSION_LIFETIME']:
+            # Make session non-permanent: expires on browser close
+            session.permanent = False
+
+            now = datetime.now()
+            last_activity = session.get('last_activity')
+            if last_activity:
+                last_activity_time = datetime.fromisoformat(last_activity)
+                # If idle for more than timeout, logout
+                if now - last_activity_time > app.config['PERMANENT_SESSION_LIFETIME']:
                     logout_user()
                     session.clear()
                     return redirect(url_for('main.index'))
+            # Update last activity time on every request
+            session['last_activity'] = now.isoformat()
     
     # Create tables
     with app.app_context():

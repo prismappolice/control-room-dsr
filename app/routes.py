@@ -25,16 +25,6 @@ def load_user(user_id):
 # Main routes
 @main_bp.route('/')
 def index():
-    # If user is already authenticated, redirect to appropriate dashboard
-    if current_user.is_authenticated:
-        if current_user.user_type == 'admin':
-            return redirect(url_for('admin.dashboard'))
-        elif current_user.user_type == 'district':
-            return redirect(url_for('district.dashboard'))
-        elif current_user.user_type == 'controlroom':
-            return redirect(url_for('district.controlroom_dashboard'))
-    
-    # If not authenticated, show the login page
     return render_template('index.html')
 
 # Authentication routes
@@ -49,11 +39,6 @@ def login():
         
         if user and user.check_password(password):
             login_user(user)
-            # Set session timeout tracking
-            session.permanent = True
-            session['login_time'] = datetime.now().isoformat()
-            session['last_activity'] = datetime.now().isoformat()
-            
             if user.user_type == 'admin':
                 return redirect(url_for('admin.dashboard'))
             elif user.user_type == 'district':
@@ -69,8 +54,6 @@ def login():
 @login_required
 def logout():
     logout_user()
-    session.clear()  # Clear all session data
-    flash('You have been logged out successfully', 'success')
     return redirect(url_for('main.index'))
 
 # Admin routes
@@ -385,153 +368,6 @@ def download_dsr(district_name, date_str):
     output.seek(0)
     
     filename = f"DSR_{district_name}_{date_str}.xlsx"
-    return send_file(
-        output,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        as_attachment=True,
-        download_name=filename
-    )
-
-@admin_bp.route('/download_one_page_dsr/<date_str>')
-@login_required
-def download_one_page_dsr(date_str):
-    """Special export for One Page DSR in vertical government proforma format"""
-    if current_user.user_type != 'admin':
-        flash('Access denied', 'error')
-        return redirect(url_for('main.index'))
-    
-    try:
-        search_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        flash('Invalid date format', 'error')
-        return redirect(url_for('admin.dashboard'))
-    
-    # Get all One Page DSR entries for this date across all districts
-    entries = DSREntry.query.filter_by(date=search_date, form_type='one_page_dsr').all()
-    
-    if not entries:
-        flash('No One Page DSR data found for the selected date', 'error')
-        return redirect(url_for('admin.dashboard'))
-    
-    # Create Excel file
-    output = io.BytesIO()
-    wb = Workbook()
-    ws = wb.active
-    ws.title = f"One_Page_DSR_{date_str}"
-    
-    # Styles
-    header_font = Font(bold=True, color="FFFFFF", size=12)
-    header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
-    subheader_font = Font(bold=True, size=11)
-    subheader_fill = PatternFill(start_color="D9E1F2", end_color="D9E1F2", fill_type="solid")
-    thin_border = Border(
-        left=Side(style='thin'), right=Side(style='thin'),
-        top=Side(style='thin'), bottom=Side(style='thin')
-    )
-    center_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-    left_alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
-    
-    # Set column widths
-    ws.column_dimensions['A'].width = 8   # S.No
-    ws.column_dimensions['B'].width = 20  # Unit
-    ws.column_dimensions['C'].width = 35  # Component
-    ws.column_dimensions['D'].width = 80  # Remarks
-    
-    # Add title
-    ws['A1'] = f"ONE PAGE DSR SUMMARY SHEET (on {search_date.strftime('%d.%m.%Y')})"
-    ws.merge_cells('A1:D1')
-    ws['A1'].font = Font(bold=True, size=14)
-    ws['A1'].alignment = center_alignment
-    ws['A1'].fill = header_fill
-    ws.row_dimensions[1].height = 25
-    
-    # Add column headers
-    row = 2
-    headers = ['S.No', 'UNIT', 'COMPONENT', 'REMARKS']
-    for col_idx, header in enumerate(headers, start=1):
-        cell = ws.cell(row=row, column=col_idx, value=header)
-        cell.font = subheader_font
-        cell.fill = subheader_fill
-        cell.border = thin_border
-        cell.alignment = center_alignment
-    ws.row_dimensions[row].height = 20
-    
-    # Get One Page DSR field configuration
-    form_config = FORM_CONFIGS.get('one_page_dsr', {})
-    fields = form_config.get('fields', [])
-    
-    # Component mapping (friendly names for display)
-    component_names = {
-        'vvip_movements_law_order': 'VVIP Movements & Law & Order',
-        'crime_important': 'Crime Important',
-        'nbw_pd_externment': 'NBW / PD / Externment',
-        'cyber_crime': 'Cyber Crime',
-        'womens_safety': "Women's Safety",
-        'sensitive_cases': 'Sensitive Cases',
-        'cctv_surveillance': 'CCTV / Surveillance',
-        'legal_issues': 'Legal Issues',
-        'focus_area_progress': 'Focus Area Progress'
-    }
-    
-    # Sort entries by district name
-    entries.sort(key=lambda x: x.district_name)
-    
-    # Process each district
-    row = 3
-    for idx, entry in enumerate(entries, start=1):
-        data = json.loads(entry.data)
-        district_name = entry.district_name
-        
-        # Calculate number of components (fields with data)
-        num_components = len([f for f in fields if data.get(f['name'], '').strip()])
-        if num_components == 0:
-            num_components = len(fields)  # Show all fields even if empty
-        
-        start_row = row
-        
-        # Add each component as a separate row
-        for field_idx, field in enumerate(fields):
-            field_name = field['name']
-            field_value = data.get(field_name, '-')
-            component_display = component_names.get(field_name, field['label'])
-            
-            # S.No (merged for all components of this district)
-            cell_sno = ws.cell(row=row, column=1, value=idx if field_idx == 0 else '')
-            cell_sno.border = thin_border
-            cell_sno.alignment = center_alignment
-            
-            # Unit name (merged for all components of this district)
-            cell_unit = ws.cell(row=row, column=2, value=district_name if field_idx == 0 else '')
-            cell_unit.border = thin_border
-            cell_unit.alignment = center_alignment
-            cell_unit.font = Font(bold=True)
-            
-            # Component name
-            cell_component = ws.cell(row=row, column=3, value=component_display)
-            cell_component.border = thin_border
-            cell_component.alignment = left_alignment
-            cell_component.font = Font(size=10)
-            
-            # Remarks (data)
-            cell_remarks = ws.cell(row=row, column=4, value=field_value or '-')
-            cell_remarks.border = thin_border
-            cell_remarks.alignment = left_alignment
-            cell_remarks.font = Font(size=10)
-            
-            # Set row height
-            ws.row_dimensions[row].height = 30
-            
-            row += 1
-        
-        # Merge S.No and Unit cells for this district
-        if num_components > 1:
-            ws.merge_cells(f'A{start_row}:A{row-1}')
-            ws.merge_cells(f'B{start_row}:B{row-1}')
-    
-    wb.save(output)
-    output.seek(0)
-    
-    filename = f"One_Page_DSR_{date_str}.xlsx"
     return send_file(
         output,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -984,12 +820,3 @@ def change_password():
             return redirect(url_for('district.controlroom_dashboard'))
     
     return render_template('change_password.html')
-
-@auth_bp.route('/extend-session', methods=['POST'])
-@login_required
-def extend_session():
-    """Extend user session when they choose to stay logged in"""
-    session.permanent = True
-    session['login_time'] = datetime.now().isoformat()
-    session['last_activity'] = datetime.now().isoformat()
-    return jsonify({'success': True, 'message': 'Session extended'})

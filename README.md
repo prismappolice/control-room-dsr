@@ -66,10 +66,10 @@ A comprehensive web application for managing Daily Status Reports (DSR) across 2
 
 ### Backend
 - **Flask 2.3.3**: Web framework
-- **SQLAlchemy 1.4.53**: Database ORM
+- **SQLAlchemy 2.0+**: Database ORM
 - **Flask-Login 0.6.3**: User session management
 - **Flask-WTF 1.2.1**: Form handling and CSRF protection
-- **SQLite**: Default database (easily switchable to MySQL/PostgreSQL)
+- **PostgreSQL**: Production-grade database
 
 ### Frontend
 - **Bootstrap 5.1.3**: Responsive UI framework
@@ -86,27 +86,38 @@ A comprehensive web application for managing Daily Status Reports (DSR) across 2
 
 ### Prerequisites
 - Python 3.8 or higher
+- PostgreSQL 12 or higher
 - pip (Python package installer)
 
 ### Installation Steps
 
 1. **Clone/Download the Project**
    ```bash
-   # Project is already set up in your current directory
-   cd "d:\control room DSR"
+   git clone https://github.com/prismappolice/control-room-dsr.git
+   cd control-room-dsr
    ```
 
-2. **Install Dependencies**
+2. **Install PostgreSQL**
+   - Download from: https://www.postgresql.org/download/
+   - Create database and user (see DEPLOYMENT.md for details)
+
+3. **Configure Environment Variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your database credentials
+   ```
+
+4. **Install Dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Run the Application**
+5. **Run the Application**
    ```bash
    python run.py
    ```
 
-4. **Access the System**
+6. **Access the System**
    - Open your web browser
    - Navigate to: `http://localhost:5000`
    - Use the default credentials below
@@ -268,11 +279,12 @@ Each of the 16 forms is configured with specific fields:
 2. Define field types and labels
 3. Form automatically appears in all interfaces
 
-### Database Migration
-To switch from SQLite to MySQL/PostgreSQL:
-1. Update `SQLALCHEMY_DATABASE_URI` in `__init__.py`
-2. Install appropriate database driver
-3. Run the application to create tables
+### Cloud Deployment
+For cloud deployment instructions, see `DEPLOYMENT.md`:
+- Render (Free tier available)
+- Railway.app
+- DigitalOcean
+- AWS/Azure/GCP
 
 ### File Upload Configuration
 - **Supported Formats**: PDF, Excel (.xlsx, .xls), Word (.docx, .doc)
@@ -306,8 +318,9 @@ For production deployment:
 ### Common Issues
 
 **Database Errors**:
-- Delete `control_room_dsr.db` and restart to reset database
-- Check file permissions in the project directory
+- Check PostgreSQL service is running
+- Verify database credentials in .env file
+- Ensure database exists and user has proper permissions
 
 **Import Errors**:
 - Ensure all dependencies are installed: `pip install -r requirements.txt`

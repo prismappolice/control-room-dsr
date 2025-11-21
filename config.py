@@ -1,30 +1,27 @@
 """
-Database Configuration Module
-Supports both SQLite (current) and PostgreSQL (future) with environment switching
-NO changes to existing functionality - identical behavior guaranteed
+Database Configuration Module for Control Room DSR
+PostgreSQL Database Configuration
 """
 
 import os
 from pathlib import Path
 
+# Try to load environment variables from .env file (optional)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # dotenv not installed, will use system environment variables
+    pass
+
 class DatabaseConfig:
     """
-    Database configuration supporting both SQLite and PostgreSQL
-    Uses environment variable to switch between databases
-    Default: SQLite (maintains current behavior)
+    PostgreSQL Database configuration
+    All settings loaded from environment variables
+    Default: PostgreSQL (no SQLite support)
     """
     
-    # Base directory for database files
-    BASE_DIR = Path(__file__).parent
-    INSTANCE_DIR = BASE_DIR / 'instance'
-    
-    # Ensure instance directory exists
-    INSTANCE_DIR.mkdir(exist_ok=True)
-    
-    # Database configurations
-    SQLITE_PATH = INSTANCE_DIR / 'database.db'
-    
-    # PostgreSQL settings (will be configured during setup)
+    # PostgreSQL settings from environment variables
     POSTGRES_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
     POSTGRES_PORT = os.environ.get('POSTGRES_PORT', '5432')
     POSTGRES_DB = os.environ.get('POSTGRES_DB', 'control_room_dsr')
@@ -34,33 +31,20 @@ class DatabaseConfig:
     @classmethod
     def get_database_uri(cls):
         """
-        Returns appropriate database URI based on environment
-        Default: SQLite (maintains current system behavior)
-        Set DATABASE_TYPE=postgresql to use PostgreSQL
+        Returns PostgreSQL database URI
+        Format: postgresql://user:password@host:port/database
         """
-        db_type = os.environ.get('DATABASE_TYPE', 'sqlite').lower()
-        
-        if db_type == 'postgresql':
-            # PostgreSQL connection string
-            return f"postgresql://{cls.POSTGRES_USER}:{cls.POSTGRES_PASSWORD}@{cls.POSTGRES_HOST}:{cls.POSTGRES_PORT}/{cls.POSTGRES_DB}"
-        else:
-            # SQLite connection string (default - current behavior)
-            return f"sqlite:///{cls.SQLITE_PATH}"
+        return f"postgresql://{cls.POSTGRES_USER}:{cls.POSTGRES_PASSWORD}@{cls.POSTGRES_HOST}:{cls.POSTGRES_PORT}/{cls.POSTGRES_DB}"
     
     @classmethod
     def get_database_type(cls):
-        """Returns current database type"""
-        return os.environ.get('DATABASE_TYPE', 'sqlite').lower()
+        """Returns database type (always postgresql)"""
+        return 'postgresql'
     
     @classmethod
     def is_postgresql(cls):
-        """Check if using PostgreSQL"""
-        return cls.get_database_type() == 'postgresql'
-    
-    @classmethod
-    def is_sqlite(cls):
-        """Check if using SQLite"""
-        return cls.get_database_type() == 'sqlite'
+        """Check if using PostgreSQL (always True)"""
+        return True
 
 # Configuration settings for Flask app
 class Config:
@@ -80,14 +64,13 @@ class Config:
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app', 'uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
 
-# Helper functions for migration
+# Helper function for configuration info
 def print_config_info():
     """Print current database configuration"""
     config = DatabaseConfig()
     print(f"Database Type: {config.get_database_type()}")
-    print(f"Database URI: {config.get_database_uri()}")
+    print(f"Database URI (masked): postgresql://{config.POSTGRES_USER}:***@{config.POSTGRES_HOST}:{config.POSTGRES_PORT}/{config.POSTGRES_DB}")
     print(f"Using PostgreSQL: {config.is_postgresql()}")
-    print(f"Using SQLite: {config.is_sqlite()}")
 
 if __name__ == '__main__':
     print("=== Database Configuration Info ===")

@@ -123,9 +123,6 @@
                         <div class="col-md-4 col-lg-3 mb-3">
                             <a href="{{ url_for('admin.district_view', district_name=district) }}" 
                                class="district-card {{ color_classes[loop.index0 % 8] }}">
-                                <div class="district-icon">
-                                    <i class="fas {{ district_icons.get(district, 'fa-building') }}"></i>
-                                </div>
                                 <div class="district-name">{{ district }}</div>
                             </a>
                         </div>

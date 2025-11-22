@@ -39,10 +39,6 @@ main {
     text-align: center;
 }
 
-.hero-content h1 {
-    font-family: Georgia, 'Times New Roman', serif;
-}
-
 .login-btn {
     padding: 1rem;
     border-radius: 10px;
@@ -209,44 +205,26 @@ main {
 /* District Cards */
 .district-card {
     display: block;
-    background: white;
-    padding: 1.5rem;
-    border-radius: 10px;
+    background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+    padding: 2rem 1rem;
+    border-radius: 15px;
     text-align: center;
     text-decoration: none;
     color: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: all 0.2s;
-    border: 2px solid transparent;
-    position: relative;
-    overflow: hidden;
-}
-
-.district-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: inherit;
-    opacity: 0.9;
-    z-index: 0;
-}
-
-.district-card > * {
-    position: relative;
-    z-index: 1;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    border: none;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .district-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
     text-decoration: none;
     color: white;
-}
-
-.district-card:hover::before {
     opacity: 1;
 }
 
@@ -428,7 +406,6 @@ main {
 
 /* Custom Header Styles */
 .header-title {
-    font-family: Georgia, 'Times New Roman', serif !important;
     font-size: 2.2rem !important;
     font-weight: 700 !important;
     color: white !important;

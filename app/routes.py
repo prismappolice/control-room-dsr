@@ -76,11 +76,17 @@ def dashboard():
     today = date.today()
     today_entries = DSREntry.query.filter_by(date=today).count()
     
+    # Color classes for district cards
+    color_classes = ['district-card-blue', 'district-card-green', 'district-card-orange', 
+                    'district-card-purple', 'district-card-red', 'district-card-teal',
+                    'district-card-pink', 'district-card-indigo']
+    
     return render_template('admin/dashboard.html', 
                          districts=DISTRICTS, 
                          forms=FORM_CONFIGS,
                          recent_entries=recent_entries,
                          recent_uploads=recent_uploads,
+                         color_classes=color_classes,
                          stats={
                              'total_districts': total_districts,
                              'total_forms': total_forms,

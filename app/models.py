@@ -55,7 +55,7 @@ class DSREntry(db.Model):
 class ControlRoomUpload(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
-    upload_type = db.Column(db.String(50), nullable=False)  # 'periscope', 'vip_engagements', 'ps_rtm'
+    upload_type = db.Column(db.String(50), nullable=False)  # 'periscope', 'vip_engagements', 'ps_rtm', 'next_24hrs_forecast', 'dg_teleconference'
     filename = db.Column(db.String(255), nullable=False)
     original_filename = db.Column(db.String(255), nullable=False)
     file_path = db.Column(db.String(500), nullable=False)

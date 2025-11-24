@@ -616,6 +616,51 @@ main {
     }
 }
 
+/* Upload Type Colors */
+.badge-purple {
+    background-color: #8e44ad !important;
+    color: white !important;
+}
+
+.border-purple {
+    border: 2px solid #8e44ad !important;
+}
+
+.border-danger {
+    border: 2px solid #dc3545 !important;
+}
+
+/* Grouped File Items */
+.file-row {
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.file-row:hover {
+    background-color: #e9ecef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateX(2px);
+}
+
+.align-top {
+    vertical-align: top !important;
+}
+
+/* Upload Area Styling */
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
 /* Footer */
 footer {
     background: var(--dark-color) !important;

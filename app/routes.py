@@ -783,6 +783,32 @@ def view_upload(upload_id):
         flash('File not found', 'error')
         return redirect(url_for('district.controlroom_dashboard'))
 
+@district_bp.route('/delete_upload/<int:upload_id>', methods=['POST', 'DELETE'])
+@login_required
+def delete_upload(upload_id):
+    if current_user.user_type != 'controlroom':
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+    
+    upload = ControlRoomUpload.query.get_or_404(upload_id)
+    
+    # Check if file belongs to current user
+    if upload.user_id != current_user.id:
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+    
+    try:
+        # Delete physical file
+        if os.path.exists(upload.file_path):
+            os.remove(upload.file_path)
+        
+        # Delete database record
+        db.session.delete(upload)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'File deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 # Profile and Password Management Routes
 @auth_bp.route('/profile')
 @login_required

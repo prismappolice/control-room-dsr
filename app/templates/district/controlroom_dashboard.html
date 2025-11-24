@@ -34,6 +34,8 @@
                                     <option value="periscope">Periscope</option>
                                     <option value="vip_engagements">VIP Engagements</option>
                                     <option value="ps_rtm">334PS RTM&E-Sakshya 334(A)case Non CPS&CPS Employees</option>
+                                    <option value="next_24hrs_forecast">Next 24 Hours Forecast</option>
+                                    <option value="dg_teleconference">DG Sir Teleconference</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -113,6 +115,45 @@
         </div>
     </div>
     
+    <!-- New Upload Categories -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100 border-purple">
+                <div class="card-body text-center">
+                    <div class="upload-icon mb-3">
+                        <i class="fas fa-clock fa-3x" style="color: #8e44ad;"></i>
+                    </div>
+                    <h5 style="color: #8e44ad;">Next 24 Hours Forecast</h5>
+                    <p class="text-muted">Upload forecast documents (PDF, Excel, etc.)</p>
+                    <div class="upload-area" data-type="next_24hrs_forecast">
+                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                        <p class="mb-0">Drag & Drop files here</p>
+                        <small class="text-muted">or click to browse</small>
+                        <input type="file" class="d-none" accept=".pdf,.xlsx,.xls,.docx,.doc">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100 border-danger">
+                <div class="card-body text-center">
+                    <div class="upload-icon mb-3">
+                        <i class="fas fa-video fa-3x text-danger"></i>
+                    </div>
+                    <h5 class="text-danger">DG Sir Teleconference</h5>
+                    <p class="text-muted">Upload teleconference related documents</p>
+                    <div class="upload-area" data-type="dg_teleconference">
+                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                        <p class="mb-0">Drag & Drop files here</p>
+                        <small class="text-muted">or click to browse</small>
+                        <input type="file" class="d-none" accept=".pdf,.xlsx,.xls,.docx,.doc">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Recent Uploads -->
     <div class="row">
         <div class="col-12">
@@ -138,17 +179,19 @@
                                 <tr>
                                     <td>{{ upload.date.strftime('%d-%m-%Y') }}</td>
                                     <td>
-                                        <span class="badge bg-secondary">
-                                            {% if upload.upload_type == 'periscope' %}
-                                                Periscope
-                                            {% elif upload.upload_type == 'vip_engagements' %}
-                                                VIP Engagements
-                                            {% elif upload.upload_type == 'ps_rtm' %}
-                                                334PS RTM&E
-                                            {% else %}
-                                                {{ upload.upload_type }}
-                                            {% endif %}
-                                        </span>
+                                        {% if upload.upload_type == 'periscope' %}
+                                            <span class="badge bg-primary">Periscope</span>
+                                        {% elif upload.upload_type == 'vip_engagements' %}
+                                            <span class="badge bg-success">VIP Engagements</span>
+                                        {% elif upload.upload_type == 'ps_rtm' %}
+                                            <span class="badge bg-warning text-dark">334PS RTM&E</span>
+                                        {% elif upload.upload_type == 'next_24hrs_forecast' %}
+                                            <span class="badge" style="background-color: #8e44ad;">Next 24 Hours Forecast</span>
+                                        {% elif upload.upload_type == 'dg_teleconference' %}
+                                            <span class="badge bg-danger">DG Sir Teleconference</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ upload.upload_type }}</span>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <i class="fas fa-file me-2"></i>
@@ -156,14 +199,22 @@
                                     </td>
                                     <td>{{ upload.uploaded_at.strftime('%d-%m-%Y %H:%M') }}</td>
                                     <td>
-                                        <a href="{{ url_for('district.download_upload', upload_id=upload.id) }}" 
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-download"></i> Download
-                                        </a>
-                                        <a href="{{ url_for('district.view_upload', upload_id=upload.id) }}" 
-                                           class="btn btn-sm btn-outline-info" target="_blank">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('district.download_upload', upload_id=upload.id) }}" 
+                                               class="btn btn-sm btn-outline-primary" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <a href="{{ url_for('district.view_upload', upload_id=upload.id) }}" 
+                                               class="btn btn-sm btn-outline-info" target="_blank" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-danger delete-upload-btn" 
+                                                    data-upload-id="{{ upload.id }}" 
+                                                    data-filename="{{ upload.original_filename }}" 
+                                                    title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -187,14 +238,158 @@
 // Set today's date as default
 document.getElementById('upload_date').valueAsDate = new Date();
 
-// Upload area click handlers
+// Get main form elements
+const mainForm = document.querySelector('form[action*="upload"]');
+const mainFileInput = document.getElementById('file');
+const mainUploadType = document.getElementById('upload_type');
+const mainUploadDate = document.getElementById('upload_date');
+
+// Drag and Drop functionality for upload areas
 document.querySelectorAll('.upload-area').forEach(area => {
-    area.addEventListener('click', function() {
-        const fileInput = this.querySelector('input[type="file"]');
-        fileInput.click();
+    const uploadType = area.getAttribute('data-type');
+    
+    // Click to browse
+    area.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Set the upload type in main form
+        mainUploadType.value = uploadType;
+        
+        // Trigger main file input
+        mainFileInput.click();
+    });
+    
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        area.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    // Highlight drop area
+    ['dragenter', 'dragover'].forEach(eventName => {
+        area.addEventListener(eventName, function() {
+            this.style.borderColor = '#0d6efd';
+            this.style.backgroundColor = '#e7f1ff';
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        area.addEventListener(eventName, function() {
+            this.style.borderColor = '#dee2e6';
+            this.style.backgroundColor = '';
+        });
+    });
+    
+    // Handle dropped files
+    area.addEventListener('drop', function(e) {
+        const files = e.dataTransfer.files;
+        
+        if (files.length > 0) {
+            const file = files[0];
+            
+            // Check file type
+            const allowedTypes = ['.pdf', '.xlsx', '.xls', '.docx', '.doc'];
+            const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!allowedTypes.includes(fileExt)) {
+                alert('Invalid file type. Please upload PDF, Excel, or Word documents only.');
+                return;
+            }
+            
+            // Set file to main form input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            mainFileInput.files = dataTransfer.files;
+            
+            // Set upload type
+            mainUploadType.value = uploadType;
+            
+            // Update display
+            area.querySelector('p').textContent = `Selected: ${file.name}`;
+            
+            // Optional: Auto-submit with confirmation
+            if (confirm(`Upload "${file.name}" as ${formatUploadTypeName(uploadType)}?`)) {
+                mainForm.submit();
+            }
+        }
     });
 });
 
-// File download and view handled by Flask routes
+// When main file input changes, update upload area display and auto-submit
+mainFileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+        const fileName = this.files[0].name;
+        const uploadType = mainUploadType.value;
+        
+        // Update corresponding upload area
+        if (uploadType) {
+            const area = document.querySelector(`.upload-area[data-type="${uploadType}"]`);
+            if (area) {
+                area.querySelector('p').textContent = `Selected: ${fileName}`;
+            }
+            
+            // Auto-submit with confirmation when file selected from upload areas
+            if (confirm(`Upload "${fileName}" as ${formatUploadTypeName(uploadType)}?`)) {
+                mainForm.submit();
+            } else {
+                // Reset if cancelled
+                this.value = '';
+                area.querySelector('p').textContent = 'Drag & Drop files here';
+            }
+        }
+    }
+});
+
+function formatUploadTypeName(type) {
+    const names = {
+        'periscope': 'Periscope',
+        'vip_engagements': 'VIP Engagements',
+        'ps_rtm': '334PS RTM&E',
+        'next_24hrs_forecast': 'Next 24 Hours Forecast',
+        'dg_teleconference': 'DG Sir Teleconference'
+    };
+    return names[type] || type;
+}
+
+// Delete upload functionality
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-upload-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const uploadId = this.getAttribute('data-upload-id');
+            const filename = this.getAttribute('data-filename');
+            
+            if (confirm(`Are you sure you want to delete "${filename}"?`)) {
+                deleteUpload(uploadId);
+            }
+        });
+    });
+});
+
+function deleteUpload(uploadId) {
+    fetch(`/district/delete_upload/${uploadId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('File deleted successfully');
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the file');
+    });
+}
 </script>
 {% endblock %}

@@ -622,12 +622,21 @@ main {
     color: white !important;
 }
 
+.badge-teal {
+    background-color: #16a085 !important;
+    color: white !important;
+}
+
 .border-purple {
     border: 2px solid #8e44ad !important;
 }
 
 .border-danger {
     border: 2px solid #dc3545 !important;
+}
+
+.border-teal {
+    border: 2px solid #16a085 !important;
 }
 
 /* Grouped File Items */

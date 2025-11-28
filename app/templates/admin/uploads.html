@@ -37,7 +37,6 @@
                                 <option value="ps_rtm">334PS RTM&E-Sakshya</option>
                                 <option value="next_24hrs_forecast">Next 24 Hours Forecast</option>
                                 <option value="dg_teleconference">DG Sir Teleconference</option>
-                                <option value="weekly_dsrs">Weekly DSRs</option>
                             </select>
                         </div>
                         <div class="col-md-4 d-flex align-items-end gap-2">
@@ -103,8 +102,6 @@
                                                     <span class="badge badge-purple fs-6">Next 24 Hours Forecast</span>
                                                 {% elif upload.upload_type == 'dg_teleconference' %}
                                                     <span class="badge bg-danger fs-6">DG Sir Teleconference</span>
-                                                {% elif upload.upload_type == 'weekly_dsrs' %}
-                                                    <span class="badge fs-6" style="background-color: #16a085;">Weekly DSRs</span>
                                                 {% else %}
                                                     <span class="badge bg-info fs-6">{{ upload.upload_type }}</span>
                                                 {% endif %}
@@ -251,8 +248,7 @@ function getBadgeClass(uploadType) {
         'vip_engagements': 'bg-success',
         'ps_rtm': 'bg-warning text-dark',
         'next_24hrs_forecast': 'badge-purple',
-        'dg_teleconference': 'bg-danger',
-        'weekly_dsrs': 'badge-teal'
+        'dg_teleconference': 'bg-danger'
     };
     return badgeClasses[uploadType] || 'bg-info';
 }
@@ -263,8 +259,7 @@ function formatUploadType(uploadType) {
         'vip_engagements': 'VIP Engagements',
         'ps_rtm': '334PS RTM&E',
         'next_24hrs_forecast': 'Next 24 Hours Forecast',
-        'dg_teleconference': 'DG Sir Teleconference',
-        'weekly_dsrs': 'Weekly DSRs'
+        'dg_teleconference': 'DG Sir Teleconference'
     };
     return typeNames[uploadType] || uploadType;
 }

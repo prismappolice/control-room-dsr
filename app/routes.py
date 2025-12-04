@@ -593,6 +593,7 @@ def form_entry(form_type):
             
             if existing_entry:
                 existing_entry.data = json.dumps(form_data)
+                existing_entry.date = entry_date_obj  # Update date field as well
                 existing_entry.updated_at = datetime.utcnow()
                 db.session.commit()
                 flash('Entry updated successfully', 'success')

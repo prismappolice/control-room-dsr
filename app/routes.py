@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from app.models import User, DSREntry, ControlRoomUpload, FORM_CONFIGS, DISTRICTS
 from app import db, login_manager
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import os
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
@@ -570,6 +570,22 @@ def form_entry(form_type):
             entry_date_obj = datetime.strptime(entry_date, '%Y-%m-%d').date()
         except ValueError:
             flash('Invalid date format', 'error')
+            return render_template('district/form_entry.html', 
+                                 form_type=form_type, 
+                                 form_config=form_config)
+        
+        # Validate date is within last 7 days (security check)
+        today = date.today()
+        seven_days_ago = today - timedelta(days=7)
+        
+        if entry_date_obj > today:
+            flash('Future dates are not allowed. Please select today or a previous date within last 7 days.', 'error')
+            return render_template('district/form_entry.html', 
+                                 form_type=form_type, 
+                                 form_config=form_config)
+        
+        if entry_date_obj < seven_days_ago:
+            flash('Date is too old. Please select a date within the last 7 days only.', 'error')
             return render_template('district/form_entry.html', 
                                  form_type=form_type, 
                                  form_config=form_config)

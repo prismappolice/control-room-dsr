@@ -64,7 +64,7 @@
 
                     <form method="POST" id="entryForm">
                         <div class="mb-3">
-                            <label for="entry_date" class="form-label">Entry Date *</label>
+                            <label for="entry_date" class="form-label">Entry Date * <small class="text-muted">(Today or last 7 days only)</small></label>
                             <input type="date" class="form-control" id="entry_date" name="entry_date" 
                                    value="{{ today }}" required>
                         </div>
@@ -253,6 +253,30 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
         });
     });
+});
+
+// Set date picker restrictions (last 7 days only)
+function setDateRestrictions() {
+    const dateInput = document.getElementById('entry_date');
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    
+    // Format dates as YYYY-MM-DD
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
+    dateInput.setAttribute('min', formatDate(sevenDaysAgo));
+    dateInput.setAttribute('max', formatDate(today));
+}
+
+// Initialize date restrictions on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setDateRestrictions();
 });
 
 // Helper functions

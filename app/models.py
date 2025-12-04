@@ -71,7 +71,7 @@ FORM_CONFIGS = {
             {'name': 'crime_head', 'type': 'text', 'label': 'Crime Head'},
             {'name': 'fir_no', 'type': 'text', 'label': 'FIR No'},
             {'name': 'facts_of_case', 'type': 'textarea', 'label': 'Facts of the Case'},
-            {'name': 'accused_status', 'type': 'text', 'label': 'Accused Status'},
+            {'name': 'accused_status', 'type': 'textarea', 'label': 'Accused Status'},
             {'name': 'action_taken', 'type': 'textarea', 'label': 'Action Taken'},
             {'name': 'legal_progress', 'type': 'textarea', 'label': 'Legal Progress'}
         ]

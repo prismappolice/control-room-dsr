@@ -194,6 +194,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Prevent Enter key from submitting form (except on submit button)
+    document.getElementById('entryForm').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.target.type !== 'textarea' && e.target.type !== 'submit') {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
     // Form validation and AJAX submission
     document.getElementById('entryForm').addEventListener('submit', function(e) {
         e.preventDefault(); // Prevent default form submission

@@ -36,6 +36,7 @@
                                     <option value="ps_rtm">334PS RTM&E-Sakshya 334(A)case Non CPS&CPS Employees</option>
                                     <option value="next_24hrs_forecast">Next 24 Hours Forecast</option>
                                     <option value="dg_teleconference">DG Sir Teleconference</option>
+                                    <option value="weekly_dsrs">Weekly DSRs</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -117,7 +118,7 @@
     
     <!-- New Upload Categories -->
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card h-100 border-purple">
                 <div class="card-body text-center">
                     <div class="upload-icon mb-3">
@@ -135,7 +136,7 @@
             </div>
         </div>
         
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card h-100 border-danger">
                 <div class="card-body text-center">
                     <div class="upload-icon mb-3">
@@ -144,6 +145,24 @@
                     <h5 class="text-danger">DG Sir Teleconference</h5>
                     <p class="text-muted">Upload teleconference related documents</p>
                     <div class="upload-area" data-type="dg_teleconference">
+                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                        <p class="mb-0">Drag & Drop files here</p>
+                        <small class="text-muted">or click to browse</small>
+                        <input type="file" class="d-none" accept=".pdf,.xlsx,.xls,.docx,.doc">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100 border-info">
+                <div class="card-body text-center">
+                    <div class="upload-icon mb-3">
+                        <i class="fas fa-calendar-week fa-3x text-info"></i>
+                    </div>
+                    <h5 class="text-info">Weekly DSRs</h5>
+                    <p class="text-muted">Upload weekly DSR reports and summaries</p>
+                    <div class="upload-area" data-type="weekly_dsrs">
                         <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
                         <p class="mb-0">Drag & Drop files here</p>
                         <small class="text-muted">or click to browse</small>
@@ -189,6 +208,8 @@
                                             <span class="badge" style="background-color: #8e44ad;">Next 24 Hours Forecast</span>
                                         {% elif upload.upload_type == 'dg_teleconference' %}
                                             <span class="badge bg-danger">DG Sir Teleconference</span>
+                                        {% elif upload.upload_type == 'weekly_dsrs' %}
+                                            <span class="badge bg-info">Weekly DSRs</span>
                                         {% else %}
                                             <span class="badge bg-secondary">{{ upload.upload_type }}</span>
                                         {% endif %}
@@ -351,7 +372,8 @@ function formatUploadTypeName(type) {
         'vip_engagements': 'VIP Engagements',
         'ps_rtm': '334PS RTM&E',
         'next_24hrs_forecast': 'Next 24 Hours Forecast',
-        'dg_teleconference': 'DG Sir Teleconference'
+        'dg_teleconference': 'DG Sir Teleconference',
+        'weekly_dsrs': 'Weekly DSRs'
     };
     return names[type] || type;
 }

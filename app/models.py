@@ -59,7 +59,7 @@ class ControlRoomUpload(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     original_filename = db.Column(db.String(255), nullable=False)
     file_path = db.Column(db.String(500), nullable=False)
-    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    uploaded_at = db.Column(db.DateTime, default=ist_now)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 # Form configurations

@@ -720,6 +720,18 @@ def upload_file():
             flash('Invalid date format', 'error')
             return render_template('district/upload.html')
         
+        # Validate date is within last 7 days (security check)
+        today = date.today()
+        seven_days_ago = today - timedelta(days=7)
+        
+        if upload_date_obj > today:
+            flash('Future dates are not allowed. Please select today or a previous date within last 7 days.', 'error')
+            return render_template('district/upload.html')
+        
+        if upload_date_obj < seven_days_ago:
+            flash('Upload date is too old. Please select a date within the last 7 days only.', 'error')
+            return render_template('district/upload.html')
+        
         # Secure filename
         filename = secure_filename(file.filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')

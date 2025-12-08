@@ -20,7 +20,7 @@
                     <form method="POST" enctype="multipart/form-data">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="upload_date" class="form-label">Upload Date *</label>
+                                <label for="upload_date" class="form-label">Upload Date * <small class="text-muted">(Today or last 7 days only)</small></label>
                                 <input type="date" class="form-control" id="upload_date" name="upload_date" required>
                             </div>
                             <div class="col-md-6">
@@ -70,8 +70,27 @@
 </div>
 
 <script>
-// Set today's date as default
-document.getElementById('upload_date').valueAsDate = new Date();
+// Set today's date as default and restrict to last 7 days
+function setDateRestrictions() {
+    const dateInput = document.getElementById('upload_date');
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    
+    // Format dates as YYYY-MM-DD
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
+    dateInput.setAttribute('min', formatDate(sevenDaysAgo));
+    dateInput.setAttribute('max', formatDate(today));
+    dateInput.valueAsDate = today;
+}
+
+setDateRestrictions();
 
 // File upload handling
 const fileInput = document.getElementById('file');

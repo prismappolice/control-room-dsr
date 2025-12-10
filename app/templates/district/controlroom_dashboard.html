@@ -34,8 +34,8 @@
                                     <option value="periscope">Periscope</option>
                                     <option value="vip_engagements">VIP Engagements</option>
                                     <option value="ps_rtm">334PS RTM&E-Sakshya 334(A)case Non CPS&CPS Employees</option>
-                                    <option value="next_24hrs_forecast">Next 24 Hours Forecast</option>
-                                    <option value="dg_teleconference">DG Sir Teleconference</option>
+                                    <option value="next_24hrs_forecast">Next 24 Hours Forecast (evening DSR)</option>
+                                    <option value="dg_teleconference">DG Sir Teleconference(Ranges and CPs)</option>
                                     <option value="weekly_dsrs">Weekly DSRs</option>
                                 </select>
                             </div>
@@ -124,7 +124,7 @@
                     <div class="upload-icon mb-3">
                         <i class="fas fa-clock fa-3x" style="color: #8e44ad;"></i>
                     </div>
-                    <h5 style="color: #8e44ad;">Next 24 Hours Forecast</h5>
+                    <h5 style="color: #8e44ad;">Next 24 Hours Forecast (evening DSR)</h5>
                     <p class="text-muted">Upload forecast documents (PDF, Excel, etc.)</p>
                     <div class="upload-area" data-type="next_24hrs_forecast">
                         <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
@@ -142,7 +142,7 @@
                     <div class="upload-icon mb-3">
                         <i class="fas fa-video fa-3x text-danger"></i>
                     </div>
-                    <h5 class="text-danger">DG Sir Teleconference</h5>
+                    <h5 class="text-danger">DG Sir Teleconference(Ranges and CPs)</h5>
                     <p class="text-muted">Upload teleconference related documents</p>
                     <div class="upload-area" data-type="dg_teleconference">
                         <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
@@ -205,9 +205,9 @@
                                         {% elif upload.upload_type == 'ps_rtm' %}
                                             <span class="badge bg-warning text-dark">334PS RTM&E</span>
                                         {% elif upload.upload_type == 'next_24hrs_forecast' %}
-                                            <span class="badge" style="background-color: #8e44ad;">Next 24 Hours Forecast</span>
+                                            <span class="badge" style="background-color: #8e44ad;">Next 24 Hours Forecast (evening DSR)</span>
                                         {% elif upload.upload_type == 'dg_teleconference' %}
-                                            <span class="badge bg-danger">DG Sir Teleconference</span>
+                                            <span class="badge bg-danger">DG Sir Teleconference(Ranges and CPs)</span>
                                         {% elif upload.upload_type == 'weekly_dsrs' %}
                                             <span class="badge bg-info">Weekly DSRs</span>
                                         {% else %}
@@ -414,8 +414,8 @@ function formatUploadTypeName(type) {
         'periscope': 'Periscope',
         'vip_engagements': 'VIP Engagements',
         'ps_rtm': '334PS RTM&E',
-        'next_24hrs_forecast': 'Next 24 Hours Forecast',
-        'dg_teleconference': 'DG Sir Teleconference',
+        'next_24hrs_forecast': 'Next 24 Hours Forecast (evening DSR)',
+        'dg_teleconference': 'DG Sir Teleconference(Ranges and CPs)',
         'weekly_dsrs': 'Weekly DSRs'
     };
     return names[type] || type;

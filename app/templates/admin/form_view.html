@@ -41,6 +41,100 @@
                 <div class="card-body">
                     {% if form_data %}
                     <div class="table-responsive">
+                        {% if form_type == 'head_wise_crime_weekly' %}
+                        <!-- Special grouped table for Head Wise Crime Weekly Statement -->
+                        <table class="table table-bordered table-sm" id="formDataTable" style="font-size: 0.85rem;">
+                            <thead>
+                                <!-- Main category headers -->
+                                <tr class="text-center fw-bold">
+                                    <th rowspan="2" class="align-middle bg-secondary text-white">S.No</th>
+                                    <th rowspan="2" class="align-middle bg-secondary text-white">District</th>
+                                    <th rowspan="2" class="align-middle bg-secondary text-white">Date</th>
+                                    <th colspan="6" class="bg-success text-white">Bodily Offences</th>
+                                    <th colspan="5" class="bg-warning">Property Offences</th>
+                                    <th colspan="5" class="bg-danger text-white">Crime Against Women</th>
+                                    <th rowspan="2" class="align-middle bg-info text-white">SC-ST</th>
+                                    <th rowspan="2" class="align-middle bg-info text-white">Riotings</th>
+                                    <th rowspan="2" class="align-middle bg-info text-white">Kidnap</th>
+                                    <th rowspan="2" class="align-middle bg-info text-white">Cheat</th>
+                                    <th rowspan="2" class="align-middle bg-info text-white">Cyber</th>
+                                    <th colspan="2" class="bg-primary text-white">Road Accidents</th>
+                                    <th rowspan="2" class="align-middle bg-secondary text-white">Other IPC</th>
+                                    <th rowspan="2" class="align-middle bg-secondary text-white">SLL</th>
+                                    <th rowspan="2" class="align-middle bg-secondary text-white">174</th>
+                                    <th rowspan="2" class="align-middle bg-secondary text-white">Missing</th>
+                                    <th rowspan="2" class="align-middle bg-secondary text-white">Others</th>
+                                    <th rowspan="2" class="align-middle bg-dark text-white">Actions</th>
+                                </tr>
+                                <!-- Sub-headers -->
+                                <tr class="text-center" style="font-size: 0.75rem;">
+                                    <th class="bg-success bg-opacity-75">Murder<br>gain</th>
+                                    <th class="bg-success bg-opacity-75">Murders</th>
+                                    <th class="bg-success bg-opacity-75">Attempt</th>
+                                    <th class="bg-success bg-opacity-75">C.Homi</th>
+                                    <th class="bg-success bg-opacity-75">Grave<br>Hurts</th>
+                                    <th class="bg-success bg-opacity-75">Simple<br>Hurts</th>
+                                    <th class="bg-warning bg-opacity-75">Dacoity</th>
+                                    <th class="bg-warning bg-opacity-75">Robbery</th>
+                                    <th class="bg-warning bg-opacity-75">H.Bs<br>Day</th>
+                                    <th class="bg-warning bg-opacity-75">H.Bs<br>Night</th>
+                                    <th class="bg-warning bg-opacity-75">Ordinary<br>Thefts</th>
+                                    <th class="bg-danger bg-opacity-75 text-white">Rape</th>
+                                    <th class="bg-danger bg-opacity-75 text-white">Others</th>
+                                    <th class="bg-danger bg-opacity-75 text-white">POCSO<br>Grave</th>
+                                    <th class="bg-danger bg-opacity-75 text-white">POCSO<br>Non-Gr</th>
+                                    <th class="bg-danger bg-opacity-75 text-white">Dowry</th>
+                                    <th class="bg-primary bg-opacity-75 text-white">Fatal</th>
+                                    <th class="bg-primary bg-opacity-75 text-white">Non-Fatal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in form_data %}
+                                <tr class="text-center">
+                                    <td>{{ loop.index }}</td>
+                                    <td class="text-start">{{ entry.district }}</td>
+                                    <td>{{ entry.date.strftime('%d-%m-%Y') }}</td>
+                                    <td data-field="bodily_murder_gain" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="bodily_murders" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="bodily_attempt_murder" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="bodily_c_homicides" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="bodily_grave_hurts" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="bodily_simple_hurts" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="property_dacoity" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="property_robbery" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="property_hbs_day" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="property_hbs_night" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="property_ordinary_thefts" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="caw_rape" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="caw_others" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="caw_pocso_sec34_56_grave" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="caw_pocso_others_sec12" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="caw_dowry_death" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="sc_st_cases" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="riotings" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="kidnappings" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="cheatings" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="cyber_offences" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="road_accidents_fatal" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="road_accidents_non_fatal" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="other_ipc_stup_drugs" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="sll_cases" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="crpc_174" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="missing_cases" data-entry="{{ entry.id }}">-</td>
+                                    <td data-field="others_if_any" data-entry="{{ entry.id }}">-</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-info view-details-btn" data-entry-id="{{ entry.id }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <!-- Standard table for other forms -->
                         <table class="table table-striped table-hover" id="formDataTable">
                             <thead class="table-dark">
                                 <tr>
@@ -78,10 +172,10 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <!-- Data populated by JavaScript at page load -->
                                 {% endfor %}
                             </tbody>
                         </table>
+                        {% endif %}
                     </div>
                     
                     <!-- Pagination -->

@@ -76,6 +76,11 @@ def dashboard():
     today = date.today()
     today_entries = DSREntry.query.filter_by(date=today).count()
     
+    # Separate daily and weekly forms
+    weekly_form_keys = ['status_ui_cases', 'status_pt_cases', 'performance_highlights_weekly', 'weekly_performance_scorecard', 'head_wise_crime_weekly']
+    daily_forms = {k: v for k, v in FORM_CONFIGS.items() if k not in weekly_form_keys}
+    weekly_forms = {k: v for k, v in FORM_CONFIGS.items() if k in weekly_form_keys}
+    
     # Color classes for district cards
     color_classes = ['district-card-blue', 'district-card-green', 'district-card-orange', 
                     'district-card-purple', 'district-card-red', 'district-card-teal',
@@ -84,6 +89,8 @@ def dashboard():
     return render_template('admin/dashboard.html', 
                          districts=DISTRICTS, 
                          forms=FORM_CONFIGS,
+                         daily_forms=daily_forms,
+                         weekly_forms=weekly_forms,
                          recent_entries=recent_entries,
                          recent_uploads=recent_uploads,
                          color_classes=color_classes,
@@ -529,8 +536,15 @@ def dashboard():
                                   .order_by(DSREntry.updated_at.desc())\
                                   .limit(10).all()
     
+    # Separate daily and weekly forms for district users too
+    weekly_form_keys = ['status_ui_cases', 'status_pt_cases', 'performance_highlights_weekly', 'weekly_performance_scorecard', 'head_wise_crime_weekly']
+    daily_forms = {k: v for k, v in FORM_CONFIGS.items() if k not in weekly_form_keys}
+    weekly_forms = {k: v for k, v in FORM_CONFIGS.items() if k in weekly_form_keys}
+    
     return render_template('district/dashboard.html', 
                          forms=FORM_CONFIGS,
+                         daily_forms=daily_forms,
+                         weekly_forms=weekly_forms,
                          recent_entries=recent_entries)
 
 @district_bp.route('/controlroom_dashboard')

@@ -255,6 +255,93 @@ FORM_CONFIGS = {
             {'name': 'to_be_completed_31_march_2025', 'type': 'number', 'label': 'To be completed by 31 March 2025'},
             {'name': 'cities_villages_connected', 'type': 'number', 'label': 'Number of cities/villages connected with CCTVs as on 02.11.2025'}
         ]
+    },
+    'status_ui_cases': {
+        'name': 'Status of UI Cases',
+        'fields': [
+            {'name': 'unit_name', 'type': 'text', 'label': 'Unit Name'},
+            {'name': 'total_ui_cases', 'type': 'number', 'label': 'Total no of UI Cases'},
+            {'name': 'pending_60_days', 'type': 'number', 'label': 'Pending more than 60 days'},
+            {'name': 'pending_90_days', 'type': 'number', 'label': 'Pending more than 90 days'},
+            {'name': 'pending_6_months', 'type': 'number', 'label': 'Pending more than 6 months'},
+            {'name': 'pending_1_year', 'type': 'number', 'label': 'Pending for above 1 year'},
+            {'name': 'action_taken', 'type': 'textarea', 'label': 'Action taken to liquidate pendency and time line'}
+        ]
+    },
+    'status_pt_cases': {
+        'name': 'Status of PT Cases',
+        'fields': [
+            {'name': 'unit_name', 'type': 'text', 'label': 'Unit Name'},
+            {'name': 'total_pt_cases', 'type': 'number', 'label': 'Total no of PT Cases'},
+            {'name': 'disposed_off', 'type': 'number', 'label': 'Disposed off'},
+            {'name': 'convictions', 'type': 'number', 'label': 'Convictions'},
+            {'name': 'acquittals', 'type': 'number', 'label': 'Acquittals'},
+            {'name': 'conviction_rate', 'type': 'text', 'label': 'Overall Conviction rate (%)'},
+            {'name': 'remarks', 'type': 'textarea', 'label': 'Remarks'}
+        ]
+    },
+    'performance_highlights_weekly': {
+        'name': 'Dist/UNIT Performance Highlights-Weekly',
+        'fields': [
+            {'name': 'unit_name', 'type': 'text', 'label': 'Unit name'},
+            {'name': 'success_story', 'type': 'textarea', 'label': 'Success story'},
+            {'name': 'officers', 'type': 'textarea', 'label': 'Officers(s)'},
+            {'name': 'crime_event_type', 'type': 'textarea', 'label': 'Crime/Event type'},
+            {'name': 'technique_used', 'type': 'textarea', 'label': 'Technique used'},
+            {'name': 'recognition_proposed', 'type': 'textarea', 'label': 'Recognition Proposed'}
+        ]
+    },
+    'weekly_performance_scorecard': {
+        'name': 'Weekly Performance Scorecard',
+        'fields': [
+            {'name': 'unit_name', 'type': 'text', 'label': 'Unit name'},
+            {'name': 'crime_detection', 'type': 'textarea', 'label': 'Crime detection'},
+            {'name': 'vc_handling', 'type': 'textarea', 'label': 'VC Handling'},
+            {'name': 'law_order_response', 'type': 'textarea', 'label': 'Law & Order Response'},
+            {'name': 'cyber_womens_cell', 'type': 'textarea', 'label': 'Cyber/women\'s Cell'},
+            {'name': 'rating', 'type': 'number', 'label': 'Rating (1-5)'},
+            {'name': 'trend_last_week', 'type': 'textarea', 'label': 'Trend Compared to Last Week'}
+        ]
+    },
+    'head_wise_crime_weekly': {
+        'name': 'Head Wise Crime Weekly Statement',
+        'fields': [
+            {'name': 'unit_head_of_crime', 'type': 'text', 'label': 'Unit/Head of Crime'},
+            # Bodily Offences
+            {'name': 'bodily_murder_gain', 'type': 'text', 'label': 'Bodily Offences → Murder for gain (302, 379 IPC)'},
+            {'name': 'bodily_murders', 'type': 'text', 'label': 'Bodily Offences → Murders (302 IPC)'},
+            {'name': 'bodily_attempt_murder', 'type': 'text', 'label': 'Bodily Offences → Attempt Murder (307 IPC)'},
+            {'name': 'bodily_c_homicides', 'type': 'text', 'label': 'Bodily Offences → C.Homicides (304 IPC)'},
+            {'name': 'bodily_grave_hurts', 'type': 'text', 'label': 'Bodily Offences → Grave Hurts (325 & 326 IPC)'},
+            {'name': 'bodily_simple_hurts', 'type': 'text', 'label': 'Bodily Offences → Simple Hurts (323 & 324 IPC)'},
+            # Property Offences
+            {'name': 'property_dacoity', 'type': 'text', 'label': 'Property Offences → Dacoity (395 IPC)'},
+            {'name': 'property_robbery', 'type': 'text', 'label': 'Property Offences → Robbery (392 & 394 IPC)'},
+            {'name': 'property_hbs_day', 'type': 'text', 'label': 'Property Offences → H.Bs by Day (454, 380 IPC)'},
+            {'name': 'property_hbs_night', 'type': 'text', 'label': 'Property Offences → H.Bs by Night (457, 380 IPC)'},
+            {'name': 'property_ordinary_thefts', 'type': 'text', 'label': 'Property Offences → Ordinary Thefts (379, 380 IPC)'},
+            # Crime Against Women - Main Category with nested POCSO
+            {'name': 'caw_rape', 'type': 'text', 'label': 'Crime Against Women → Rape (376 IPC)'},
+            {'name': 'caw_others', 'type': 'text', 'label': 'Crime Against Women → Others (354, 354A, 354D, 509 IPC)'},
+            {'name': 'caw_pocso_sec34_56_grave', 'type': 'text', 'label': 'Crime Against Women → POCSO → Sec 3&4/5&6 of POCSO – Grave'},
+            {'name': 'caw_pocso_others_sec12', 'type': 'text', 'label': 'Crime Against Women → POCSO → Others (Sec 12) Non-Grave'},
+            {'name': 'caw_dowry_death', 'type': 'text', 'label': 'Crime Against Women → Dowry Death (304B)'},
+            # Other Crime Categories
+            {'name': 'sc_st_cases', 'type': 'text', 'label': 'SC-ST Cases'},
+            {'name': 'riotings', 'type': 'text', 'label': 'Riotings (147, 148, 149 IPC)'},
+            {'name': 'kidnappings', 'type': 'text', 'label': 'Kidnappings (363, 369 IPC)'},
+            {'name': 'cheatings', 'type': 'text', 'label': 'Cheatings (420 IPC)'},
+            {'name': 'cyber_offences', 'type': 'text', 'label': 'Cyber Offences'},
+            # Road Accidents
+            {'name': 'road_accidents_fatal', 'type': 'text', 'label': 'Road Accidents → Fatal'},
+            {'name': 'road_accidents_non_fatal', 'type': 'text', 'label': 'Road Accidents → Non-Fatal'},
+            # Other Categories
+            {'name': 'other_ipc_stup_drugs', 'type': 'text', 'label': 'Other IPC + Stup. Drugs'},
+            {'name': 'sll_cases', 'type': 'text', 'label': 'SLL cases (Excise/AP PROHIBITION Act/Gaming/NDPS/IT Act/etc.)'},
+            {'name': 'crpc_174', 'type': 'text', 'label': '174 Cr.P.C'},
+            {'name': 'missing_cases', 'type': 'text', 'label': 'Missing Cases'},
+            {'name': 'others_if_any', 'type': 'text', 'label': 'Others if any'}
+        ]
     }
 }
 

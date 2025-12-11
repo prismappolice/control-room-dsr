@@ -73,7 +73,8 @@ FORM_CONFIGS = {
             {'name': 'facts_of_case', 'type': 'textarea', 'label': 'Facts of the Case'},
             {'name': 'accused_status', 'type': 'textarea', 'label': 'Accused Status'},
             {'name': 'action_taken', 'type': 'textarea', 'label': 'Action Taken'},
-            {'name': 'legal_progress', 'type': 'textarea', 'label': 'Legal Progress'}
+            {'name': 'legal_progress', 'type': 'textarea', 'label': 'Legal Progress'},
+            {'name': 'remarks', 'type': 'textarea', 'label': 'Remarks'}
         ]
     },
     'nbw_status': {

@@ -77,26 +77,40 @@
                         
                         <div class="row">
                             {% for field in form_config.fields %}
-                            <div class="{% if field.type == 'textarea' %}col-12{% else %}col-md-6{% endif %} mb-3">
-                                <label for="{{ field.name }}" class="form-label">
-                                    {{ field.label }}
-                                    {% if field.get('required') %}<span class="text-danger">*</span>{% endif %}
-                                </label>
-                                
-                                {% if field.type == 'textarea' %}
-                                <textarea class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
-                                          rows="3" placeholder="Enter {{ field.label.lower() }}"></textarea>
-                                {% elif field.type == 'number' %}
-                                <input type="number" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
-                                       placeholder="Enter {{ field.label.lower() }}" min="0">
-                                {% elif field.type == 'date' %}
-                                <input type="date" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
-                                       placeholder="Enter {{ field.label.lower() }}">
+                                {% if field.type == 'section' %}
+                                    </div>
+                                    <div class="col-12 my-3">
+                                        <h5 class="text-white bg-primary p-2 rounded"><i class="fas fa-folder me-2"></i>{{ field.label }}</h5>
+                                    </div>
+                                    <div class="row">
+                                {% elif field.type == 'subsection' %}
+                                    </div>
+                                    <div class="col-12 my-2">
+                                        <h6 class="text-white bg-info p-2 rounded ms-3"><i class="fas fa-level-down-alt me-2"></i>{{ field.label }}</h6>
+                                    </div>
+                                    <div class="row">
                                 {% else %}
-                                <input type="text" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
-                                       placeholder="Enter {{ field.label.lower() }}">
+                                    <div class="{% if field.type == 'textarea' %}col-12{% else %}col-md-6{% endif %} mb-3 {% if field.get('section') == 'pocso' %}ms-4{% elif field.get('section') %}ms-2{% endif %}">
+                                        <label for="{{ field.name }}" class="form-label">
+                                            {{ field.label }}
+                                            {% if field.get('required') %}<span class="text-danger">*</span>{% endif %}
+                                        </label>
+                                        
+                                        {% if field.type == 'textarea' %}
+                                        <textarea class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                                  rows="3" placeholder="Enter {{ field.label.lower() }}"></textarea>
+                                        {% elif field.type == 'number' %}
+                                        <input type="number" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                               placeholder="Enter {{ field.label.lower() }}" min="0">
+                                        {% elif field.type == 'date' %}
+                                        <input type="date" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                               placeholder="Enter {{ field.label.lower() }}">
+                                        {% else %}
+                                        <input type="text" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                                               placeholder="Enter {{ field.label.lower() }}">
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
-                            </div>
                             {% endfor %}
                         </div>
                         

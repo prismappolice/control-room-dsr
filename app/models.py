@@ -305,37 +305,43 @@ FORM_CONFIGS = {
     },
     'head_wise_crime_weekly': {
         'name': 'Head Wise Crime Weekly Statement',
+        'is_grouped': True,  # Special flag for grouped display
         'fields': [
-            {'name': 'unit_head_of_crime', 'type': 'text', 'label': 'Unit/Head of Crime'},
-            # Bodily Offences
-            {'name': 'bodily_murder_gain', 'type': 'text', 'label': 'Bodily Offences → Murder for gain (302, 379 IPC)'},
-            {'name': 'bodily_murders', 'type': 'text', 'label': 'Bodily Offences → Murders (302 IPC)'},
-            {'name': 'bodily_attempt_murder', 'type': 'text', 'label': 'Bodily Offences → Attempt Murder (307 IPC)'},
-            {'name': 'bodily_c_homicides', 'type': 'text', 'label': 'Bodily Offences → C.Homicides (304 IPC)'},
-            {'name': 'bodily_grave_hurts', 'type': 'text', 'label': 'Bodily Offences → Grave Hurts (325 & 326 IPC)'},
-            {'name': 'bodily_simple_hurts', 'type': 'text', 'label': 'Bodily Offences → Simple Hurts (323 & 324 IPC)'},
-            # Property Offences
-            {'name': 'property_dacoity', 'type': 'text', 'label': 'Property Offences → Dacoity (395 IPC)'},
-            {'name': 'property_robbery', 'type': 'text', 'label': 'Property Offences → Robbery (392 & 394 IPC)'},
-            {'name': 'property_hbs_day', 'type': 'text', 'label': 'Property Offences → H.Bs by Day (454, 380 IPC)'},
-            {'name': 'property_hbs_night', 'type': 'text', 'label': 'Property Offences → H.Bs by Night (457, 380 IPC)'},
-            {'name': 'property_ordinary_thefts', 'type': 'text', 'label': 'Property Offences → Ordinary Thefts (379, 380 IPC)'},
-            # Crime Against Women - Main Category with nested POCSO
-            {'name': 'caw_rape', 'type': 'text', 'label': 'Crime Against Women → Rape (376 IPC)'},
-            {'name': 'caw_others', 'type': 'text', 'label': 'Crime Against Women → Others (354, 354A, 354D, 509 IPC)'},
-            {'name': 'caw_pocso_sec34_56_grave', 'type': 'text', 'label': 'Crime Against Women → POCSO → Sec 3&4/5&6 of POCSO – Grave'},
-            {'name': 'caw_pocso_others_sec12', 'type': 'text', 'label': 'Crime Against Women → POCSO → Others (Sec 12) Non-Grave'},
-            {'name': 'caw_dowry_death', 'type': 'text', 'label': 'Crime Against Women → Dowry Death (304B)'},
-            # Other Crime Categories
+            {'name': 'unit_head_of_crime', 'type': 'text', 'label': 'Unit/Head of Crime', 'section': None},
+            # Bodily Offences Section
+            {'name': 'section_bodily', 'type': 'section', 'label': 'Bodily Offences'},
+            {'name': 'bodily_murder_gain', 'type': 'text', 'label': 'Murder for gain (302, 379 IPC)', 'section': 'bodily'},
+            {'name': 'bodily_murders', 'type': 'text', 'label': 'Murders (302 IPC)', 'section': 'bodily'},
+            {'name': 'bodily_attempt_murder', 'type': 'text', 'label': 'Attempt Murder (307 IPC)', 'section': 'bodily'},
+            {'name': 'bodily_c_homicides', 'type': 'text', 'label': 'C.Homicides (304 IPC)', 'section': 'bodily'},
+            {'name': 'bodily_grave_hurts', 'type': 'text', 'label': 'Grave Hurts (325 & 326 IPC)', 'section': 'bodily'},
+            {'name': 'bodily_simple_hurts', 'type': 'text', 'label': 'Simple Hurts (323 & 324 IPC)', 'section': 'bodily'},
+            # Property Offences Section
+            {'name': 'section_property', 'type': 'section', 'label': 'Property Offences'},
+            {'name': 'property_dacoity', 'type': 'text', 'label': 'Dacoity (395 IPC)', 'section': 'property'},
+            {'name': 'property_robbery', 'type': 'text', 'label': 'Robbery (392 & 394 IPC)', 'section': 'property'},
+            {'name': 'property_hbs_day', 'type': 'text', 'label': 'H.Bs by Day (454, 380 IPC)', 'section': 'property'},
+            {'name': 'property_hbs_night', 'type': 'text', 'label': 'H.Bs by Night (457, 380 IPC)', 'section': 'property'},
+            {'name': 'property_ordinary_thefts', 'type': 'text', 'label': 'Ordinary Thefts (379, 380 IPC)', 'section': 'property'},
+            # Crime Against Women Section
+            {'name': 'section_caw', 'type': 'section', 'label': 'Crime Against Women'},
+            {'name': 'caw_rape', 'type': 'text', 'label': 'Rape (376 IPC)', 'section': 'caw'},
+            {'name': 'caw_others', 'type': 'text', 'label': 'Others (354, 354A, 354D, 509 IPC)', 'section': 'caw'},
+            {'name': 'section_pocso', 'type': 'subsection', 'label': 'POCSO', 'parent': 'caw'},
+            {'name': 'caw_pocso_sec34_56_grave', 'type': 'text', 'label': 'Sec 3&4/5&6 of POCSO – Grave', 'section': 'pocso'},
+            {'name': 'caw_pocso_others_sec12', 'type': 'text', 'label': 'Others (Sec 12) Non-Grave', 'section': 'pocso'},
+            {'name': 'caw_dowry_death', 'type': 'text', 'label': 'Dowry Death (304B)', 'section': 'caw'},
+            # Other Categories
             {'name': 'sc_st_cases', 'type': 'text', 'label': 'SC-ST Cases'},
             {'name': 'riotings', 'type': 'text', 'label': 'Riotings (147, 148, 149 IPC)'},
             {'name': 'kidnappings', 'type': 'text', 'label': 'Kidnappings (363, 369 IPC)'},
             {'name': 'cheatings', 'type': 'text', 'label': 'Cheatings (420 IPC)'},
             {'name': 'cyber_offences', 'type': 'text', 'label': 'Cyber Offences'},
-            # Road Accidents
-            {'name': 'road_accidents_fatal', 'type': 'text', 'label': 'Road Accidents → Fatal'},
-            {'name': 'road_accidents_non_fatal', 'type': 'text', 'label': 'Road Accidents → Non-Fatal'},
-            # Other Categories
+            # Road Accidents Section
+            {'name': 'section_road', 'type': 'section', 'label': 'Road Accidents'},
+            {'name': 'road_accidents_fatal', 'type': 'text', 'label': 'Fatal', 'section': 'road'},
+            {'name': 'road_accidents_non_fatal', 'type': 'text', 'label': 'Non-Fatal', 'section': 'road'},
+            # Final Categories
             {'name': 'other_ipc_stup_drugs', 'type': 'text', 'label': 'Other IPC + Stup. Drugs'},
             {'name': 'sll_cases', 'type': 'text', 'label': 'SLL cases (Excise/AP PROHIBITION Act/Gaming/NDPS/IT Act/etc.)'},
             {'name': 'crpc_174', 'type': 'text', 'label': '174 Cr.P.C'},

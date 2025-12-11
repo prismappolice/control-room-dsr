@@ -259,9 +259,15 @@ def download_dsr(district_name, date_str):
         ws[f'A{row}'].font = header_font
         ws[f'A{row}'].fill = header_fill
         
+        # Special handling for Head Wise Crime Weekly Statement (grouped form)
+        if form_type == 'head_wise_crime_weekly' and form_config.get('is_grouped'):
+            # Skip sections/subsections for data fields
+            fields = [f for f in form_config.get('fields', []) if f.get('type') not in ['section', 'subsection']]
+        else:
+            fields = form_config.get('fields', [])
+        
         # Use horizontal table format for all entries (consistent professional format)
         # Get field names and filter fields that have values
-        fields = form_config.get('fields', [])
         used_fields = []
         for field in fields:
             field_name = field['name']

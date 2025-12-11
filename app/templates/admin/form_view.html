@@ -47,7 +47,9 @@
                                     <th>District</th>
                                     <th>Date</th>
                                     {% for field in form_config.fields %}
+                                        {% if field.type not in ['section', 'subsection'] %}
                                     <th>{{ field.label }}</th>
+                                        {% endif %}
                                     {% endfor %}
                                     <th>Actions</th>
                                 </tr>
@@ -58,9 +60,11 @@
                                     <td>{{ entry.district }}</td>
                                     <td>{{ entry.date.strftime('%d-%m-%Y') }}</td>
                                     {% for field in form_config.fields %}
+                                        {% if field.type not in ['section', 'subsection'] %}
                                     <td class="field-data" data-field="{{ field.name }}" data-entry="{{ entry.id }}">
                                         <!-- Data will be populated by JavaScript -->
                                     </td>
+                                        {% endif %}
                                     {% endfor %}
                                     <td>
                                         <div class="btn-group" role="group">

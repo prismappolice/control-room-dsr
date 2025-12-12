@@ -254,7 +254,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <!-- Template data for JavaScript -->
 <script type="application/json" id="formData">{{ form_data | tojson }}</script>
 <script type="application/json" id="formConfig">{{ form_config | tojson }}</script>
